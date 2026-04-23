@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>MAX Афиша</title>
+  <meta name="theme-color" content="#0b0f17" />
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="https://st.max.ru/js/max-web-app.js"></script>
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <div class="status-spacer"></div>
+    <header class="app-header">
+      <div class="header-left">
+        <button id="headerBack" class="icon-btn hidden" aria-label="Назад">
+          <span>←</span>
+        </button>
+        <div>
+          <div class="app-kicker">Mini App for MAX</div>
+          <h1 id="appTitle">Афиша</h1>
+        </div>
+      </div>
+      <button id="menuButton" class="icon-btn" aria-label="Меню">
+        <span>⋯</span>
+      </button>
+    </header>
+
+    <main id="view" class="view"></main>
+
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-tab="home">
+        <span class="nav-icon">⌂</span>
+        <span>Главная</span>
+      </button>
+      <button class="nav-btn" data-tab="favorites">
+        <span class="nav-icon">♡</span>
+        <span>Избранное</span>
+      </button>
+      <button class="nav-btn" data-tab="notifications">
+        <span class="nav-icon">🔔</span>
+        <span>Уведомления</span>
+      </button>
+    </nav>
+  </div>
+
+  <div id="overlayRoot"></div>
+
+  <template id="loadingTemplate">
+    <section class="screen centered">
+      <div class="loader"></div>
+      <p class="muted">Загружаем мини-приложение…</p>
+    </section>
+  </template>
+
+  <script src="./app.js"></script>
+</body>
+</html>
