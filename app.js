@@ -1,301 +1,261 @@
-const view = document.getElementById('view');
-const bottomNav = document.getElementById('bottomNav');
-const overlayRoot = document.getElementById('overlayRoot');
+(() => {
+  'use strict';
 
-const MONTHS = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
-const MONTHS_NOM = ['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'];
-const WEEKDAYS = ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
-const WEEKDAYS_SHORT = ['вс','пн','вт','ср','чт','пт','сб'];
+  const app = document.getElementById('app');
+  const tabbar = document.getElementById('tabbar');
+  const modal = document.getElementById('modal');
 
-const img = {
-  museum: 'https://images.unsplash.com/photo-1518998053901-5348d3961a04?auto=format&fit=crop&w=500&q=80',
-  theater: 'https://images.unsplash.com/photo-1507924538820-ede94a04019d?auto=format&fit=crop&w=500&q=80',
-  gallery: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=500&q=80',
-  kids: 'https://images.unsplash.com/photo-1607453998774-d533f65dac99?auto=format&fit=crop&w=500&q=80',
-  concert: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=500&q=80',
-  city: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=500&q=80',
-  sea: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=500&q=80',
-  default: ''
-};
-
-function moscowToday() {
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Europe/Moscow', year: 'numeric', month: '2-digit', day: '2-digit'
-  }).formatToParts(new Date()).reduce((acc, p) => (acc[p.type] = p.value, acc), {});
-  return new Date(Number(parts.year), Number(parts.month) - 1, Number(parts.day));
-}
-function addDays(date, days) { const d = new Date(date); d.setDate(d.getDate() + days); return d; }
-function iso(date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
-}
-function fromIso(value) { const [y,m,d] = value.split('-').map(Number); return new Date(y, m - 1, d); }
-function formatDayMonth(date) { return `${date.getDate()} ${MONTHS[date.getMonth()]}`; }
-function relativeDate(date) {
-  const today = moscowToday();
-  const diff = Math.round((date - today) / 86400000);
-  if (diff === 0) return ['Сегодня', formatDayMonth(date)];
-  if (diff === 1) return ['Завтра', formatDayMonth(date)];
-  if (diff === 2) return ['Послезавтра', formatDayMonth(date)];
-  return [formatDayMonth(date), WEEKDAYS[date.getDay()]];
-}
-function h(text = '') {
-  return String(text).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-}
-function plural(n, a, b, c) {
-  n = Math.abs(n) % 100; const n1 = n % 10;
-  if (n > 10 && n < 20) return c;
-  if (n1 > 1 && n1 < 5) return b;
-  if (n1 === 1) return a;
-  return c;
-}
-function placeIcon() { return '<svg viewBox="0 0 24 24"><path d="M12 21s7-5.2 7-12A7 7 0 0 0 5 9c0 6.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>'; }
-function heartIcon() { return '<svg class="fillable" viewBox="0 0 24 24"><path d="M12 21s-7.2-4.5-9.4-8.7C.6 8.5 2.6 5 6.5 5c2.2 0 3.8 1.3 5.5 3.4C13.7 6.3 15.3 5 17.5 5c3.9 0 5.9 3.5 3.9 7.3C19.2 16.5 12 21 12 21z"/></svg>'; }
-function bellIcon() { return '<svg viewBox="0 0 24 24"><path d="M18 10a6 6 0 0 0-12 0v4.2L4.3 17A1 1 0 0 0 5 18.5h14a1 1 0 0 0 .7-1.5L18 14.2V10z"/><path d="M10 20a2.2 2.2 0 0 0 4 0"/></svg>'; }
-function calendarIcon() { return '<svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>'; }
-function clockIcon() { return '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>'; }
-
-function buildEvents() {
-  const today = moscowToday();
-  return [
-    { id:'sev1', offset:0, time:'11:00', title:'Путешествие по закулисью', venue:'Севастопольский театр кукол', address:'Севастополь, проспект Победы 9', image:img.kids, desc:'6+ Рекомендуемый возраст: 6+. Продолжительность экскурсии: 1 час. Хотите попасть в сказочный мир закулисья театра кукол? У вас есть уникальная возможность своими глазами увидеть театр кукол изнутри, узнать множество театральных легенд и секретов, прогуляться по театральным мастерским, где работают настоящие волшебники.', rating:0 },
-    { id:'sev2', offset:0, time:'11:00', title:'Не улетай', venue:'Севастопольский театр драмы и комедии', address:'Севастополь, улица Ленина 12', image:img.theater, desc:'Семейный спектакль о дружбе, смелости и маленьких решениях, которые меняют большой день. Подходит для зрителей всех возрастов.', rating:5 },
-    { id:'sev3', offset:0, time:'12:00', title:'Выставка «Первый в России»', venue:'Государственный объединенный музей', address:'Севастополь, Исторический бульвар 1', image:img.museum, desc:'Историческая выставка о людях, событиях и предметах, которые стали первыми в своем деле и повлияли на развитие региона.', rating:4 },
-    { id:'sev4', offset:0, time:'16:00', title:'Пиковая дама', venue:'Академический театр драмы', address:'Севастополь, проспект Нахимова 6', image:img.theater, desc:'Классическая история в современной сценической форме. Напряжение, азарт и тонкая психологическая игра.', rating:5 },
-    { id:'sev5', offset:0, time:'17:00', title:'Диалоги в искусстве: художник, зритель и город', venue:'Художественная галерея', address:'Севастополь, улица Большая Морская 15', image:img.gallery, desc:'Открытая встреча о том, как смотреть искусство, понимать контекст и находить в работах личные смыслы.', rating:0 },
-    { id:'sev6', offset:1, time:'10:00', title:'Морская прогулка и экскурсия по бухтам', venue:'Графская пристань', address:'Севастополь, Графская пристань', image:img.sea, desc:'Маршрут по знаковым бухтам города с рассказом о флотской истории, архитектуре и природных видах Севастополя.', rating:5 },
-    { id:'sev7', offset:1, time:'18:00', title:'Ханума', venue:'Севастопольский драматический театр', address:'Севастополь, проспект Нахимова 6', image:img.theater, desc:'Спектакль «Ханума» — всем известная история о соперничестве двух свах, блестяще воплощенная на сцене. События разворачиваются в старинном городе, где каждая встреча может изменить судьбу.', rating:5 },
-    { id:'sev8', offset:1, time:'20:00', title:'Вечерний концерт на набережной', venue:'Приморский бульвар', address:'Севастополь, Приморский бульвар', image:img.concert, desc:'Музыка под открытым небом, вечерний город и программа из популярных композиций.', rating:4 },
-    { id:'sev9', offset:2, time:'10:00', title:'Архитектурная прогулка по центру Севастополя', venue:'Площадь Нахимова', address:'Севастополь, площадь Нахимова', image:img.city, desc:'Пешеходный маршрут по ключевым зданиям центра, скрытым деталям фасадов и городским историям.', rating:0 },
-    { id:'sev10', offset:2, time:'17:00', title:'Камерный концерт классической музыки', venue:'Дом офицеров флота', address:'Севастополь, улица Ленина 9', image:img.concert, desc:'Камерная программа в уютном зале: классика, романтические произведения и авторские комментарии исполнителей.', rating:5 },
-    { id:'sev11', offset:3, time:'11:00', title:'Детская мастерская выходного дня', venue:'Культурный центр', address:'Севастополь, улица Льва Толстого 51', image:img.kids, desc:'Творческая мастерская для детей и родителей. Участники создадут собственную работу и заберут ее с собой.', rating:0 },
-    { id:'sev12', offset:3, time:'19:00', title:'Спектакль «Вафельное сердце»', venue:'Театр юного зрителя', address:'Севастополь, улица Адмирала Октябрьского 2', image:img.theater, desc:'Теплый спектакль о детстве, дружбе, семье и важности маленьких обещаний.', rating:5 }
-  ].map(e => ({...e, date: iso(addDays(today, e.offset)), ticketUrl: `https://yandex.ru/maps/?text=${encodeURIComponent(e.address)}`}));
-}
-let EVENTS = buildEvents();
-
-const venues = ['Все площадки', ...Array.from(new Set(EVENTS.map(e => e.venue)))];
-const saved = JSON.parse(localStorage.getItem('afisha_state_v5') || '{}');
-const state = {
-  tab: 'home',
-  date: saved.date || iso(moscowToday()),
-  venue: saved.venue || 'Все площадки',
-  favorites: saved.favorites || [],
-  subscriptions: saved.subscriptions || [],
-  reviews: saved.reviews || {},
-  current: saved.current || EVENTS[0].id,
-  expanded: false
-};
-function save() {
-  localStorage.setItem('afisha_state_v5', JSON.stringify({
-    date: state.date, venue: state.venue, favorites: state.favorites,
-    subscriptions: state.subscriptions, reviews: state.reviews, current: state.current
-  }));
-}
-function byId(id) { return EVENTS.find(e => e.id === id); }
-function isFav(id) { return state.favorites.includes(id); }
-function isSub(id) { return state.subscriptions.includes(id); }
-function filteredEvents() {
-  return EVENTS.filter(e => e.date === state.date && (state.venue === 'Все площадки' || e.venue === state.venue));
-}
-function dayGroups() {
-  const today = moscowToday();
-  return [0,1,2,3].map(offset => {
-    const d = addDays(today, offset);
-    const dateIso = iso(d);
-    const items = EVENTS.filter(e => e.date === dateIso && (state.venue === 'Все площадки' || e.venue === state.venue));
-    return { date: d, iso: dateIso, items };
-  }).filter(g => g.items.length);
-}
-
-function filterShell() {
-  return `<section class="filters-shell"><div class="filters">
-    <button class="filter-btn" data-action="date">${calendarIcon()}<span class="filter-label">${state.date === iso(moscowToday()) ? 'Выберите дату' : formatDayMonth(fromIso(state.date))}</span></button>
-    <button class="filter-btn" data-action="venue">${placeIcon()}<span class="filter-label">${h(state.venue)}</span></button>
-  </div></section>`;
-}
-function renderFeatureCard(e) {
-  return `<article class="feature-card" data-event="${e.id}">
-    <img class="feature-img" src="${e.image}" alt="">
-    <div class="feature-body"><div class="feature-title">${h(e.title)}</div><div class="place">${placeIcon()}<span>${h(e.venue)}</span></div></div>
-  </article>`;
-}
-function renderEventCard(e, action = true) {
-  return `<article class="event-card ${action ? 'with-action' : ''}" data-event="${e.id}">
-    <img class="event-img" src="${e.image}" alt="">
-    <div class="event-main">
-      <div class="event-time">${h(e.time)}</div>
-      <div class="event-title">${h(e.title)}</div>
-      <div class="place">${placeIcon()}<span>${h(e.venue)}</span></div>
-    </div>
-    ${action ? `<div class="event-actions"><button class="icon-btn ${isFav(e.id) ? 'active' : ''}" data-fav="${e.id}" aria-label="Избранное">${heartIcon()}</button></div>` : ''}
-  </article>`;
-}
-function renderAllDay(group, expanded = true) {
-  const count = group.items.length + 38;
-  return `<section class="date-block">
-    <div class="date-heading">${h(relativeDate(group.date)[0])}<span class="sub">${h(relativeDate(group.date)[1])}</span></div>
-    <button class="all-day" data-set-date="${group.iso}">
-      <span class="clock">${clockIcon()}</span>
-      <span><span class="all-day-title">Весь день</span><span class="all-day-count">${count} ${plural(count, 'мероприятие', 'мероприятия', 'мероприятий')}</span></span>
-      <span class="count-pill">${count}</span><span class="chevron">${expanded ? '⌃' : '⌄'}</span>
-    </button>
-    ${expanded ? `<div class="feature-row">${group.items.slice(0, 4).map(renderFeatureCard).join('')}</div>` : ''}
-    <div class="events-list">${group.items.map(e => renderEventCard(e)).join('')}</div>
-  </section>`;
-}
-
-function renderHome() {
-  const selected = filteredEvents();
-  let groups;
-  if (state.date === iso(moscowToday())) groups = dayGroups();
-  else {
-    const d = fromIso(state.date);
-    groups = [{date: d, iso: state.date, items: selected}];
+  if (window.WebApp) {
+    try { window.WebApp.ready?.(); window.WebApp.expand?.(); } catch (_) {}
   }
-  view.innerHTML = `<div class="screen">${filterShell()}${groups.length ? groups.map((g, i) => renderAllDay(g, i === 0)).join('') : '<div class="empty">На выбранную дату событий пока нет.</div>'}</div>`;
-}
-function renderFavorites() {
-  const items = EVENTS.filter(e => isFav(e.id));
-  view.innerHTML = `<div class="screen">${filterShell()}<section class="section-intro"><h1>Ваш список избранных мероприятий</h1><p>Даты, которые вы сохранили, чтобы не потерять среди общей ленты</p></section><div class="events-list">${items.length ? items.map(e => renderEventCard(e)).join('') : '<div class="empty">Вы пока не добавили события в избранное.</div>'}</div></div>`;
-}
-function renderSubscriptionCard(e) {
-  const d1 = fromIso(e.date), d2 = addDays(d1, 23);
-  return `<article class="subscription-card">
-    <div class="sub-head"><img src="${e.image}" alt=""><div><div class="sub-title">${h(e.title)}</div><div class="place">${placeIcon()}<span>${h(e.venue)}</span></div></div><button class="icon-btn active" data-sub="${e.id}">${bellIcon()}</button></div>
-    <div class="sub-dates">
-      <div class="sub-row"><span>${formatDayMonth(d1)} <small>${WEEKDAYS_SHORT[d1.getDay()]}</small></span><button class="icon-btn ${isFav(e.id) ? 'active' : ''}" data-fav="${e.id}">${heartIcon()}</button><span class="sub-time">${e.time}</span></div>
-      <div class="sub-row"><span>${formatDayMonth(d2)} <small>${WEEKDAYS_SHORT[d2.getDay()]}</small></span><span></span><span class="sub-time">17:00</span></div>
-    </div>
-  </article>`;
-}
-function renderSubscriptions() {
-  const items = EVENTS.filter(e => isSub(e.id));
-  view.innerHTML = `<div class="screen">${filterShell()}<section class="section-intro"><h1>Список подписок</h1><p>Вы получите уведомление, когда организатор добавит новые даты</p></section><div class="events-list">${items.length ? items.map(renderSubscriptionCard).join('') : '<div class="empty">Подписок пока нет.</div>'}</div></div>`;
-}
-function renderDetail() {
-  const e = byId(state.current) || EVENTS[0];
-  const d = fromIso(e.date);
-  const rel = relativeDate(d)[0];
-  const reviews = state.reviews[e.id] || [];
-  const countReviews = reviews.length || (e.rating ? 1 : 0);
-  const avg = reviews.length ? Math.round(reviews.reduce((s, r) => s + r.rating, 0) / reviews.length) : e.rating;
-  const short = e.desc.length > 260 && !state.expanded;
-  const desc = short ? e.desc.slice(0, 260).trim() + '…' : e.desc;
-  view.innerHTML = `<div class="screen detail">
-    <button class="back-floating" data-back>‹</button>
-    <section class="detail-hero"><img src="${e.image}" alt=""></section>
-    <section class="detail-card">
-      <h1 class="detail-title">${h(e.title)}</h1>
-      <div class="detail-date">${h(rel)} в ${h(e.time)}</div>
-      <div class="detail-place">${placeIcon()}<span>${h(e.venue)}</span><span>›</span></div>
-      <div class="detail-actions">
-        <button class="pill ${isFav(e.id) ? 'active' : ''}" data-fav="${e.id}">${heartIcon()} ${isFav(e.id) ? 'В избранном' : 'Избранное'}</button>
-        <button class="pill ${isSub(e.id) ? 'active' : ''}" data-sub="${e.id}">${bellIcon()} ${isSub(e.id) ? 'Подписаны' : 'Подписаться'}</button>
-        <button class="pill" data-help>?</button>
-      </div>
-      <div class="divider"></div>
-      <section class="block"><h2>О событии</h2><div class="description">${h(desc)}</div>${e.desc.length > 260 ? `<button class="read-more" data-expand>${state.expanded ? 'Свернуть ^' : 'Читать далее ›'}</button>` : ''}</section>
-      <button class="review-link" data-reviews="${e.id}"><span class="review-score"><span>${avg || '☆'}</span>${avg ? '<span class="star">★</span>' : ''}</span><span><span class="review-title">${countReviews ? 'Отзывы' : 'Отзывов пока нет'}</span><span class="review-sub">${countReviews ? `${countReviews} ${plural(countReviews, 'отзыв', 'отзыва', 'отзывов')}` : 'Будьте первым, кто оставит отзыв'}</span></span><span>›</span></button>
-      <section class="block"><h2>Также доступны другие даты:</h2><div class="date-option"><span>${formatDayMonth(addDays(d, 23))}, 17:00</span><span class="ticket-small">Билеты</span><button class="icon-btn ${isFav(e.id) ? 'active' : ''}" data-fav="${e.id}">${heartIcon()}</button></div></section>
-      <section class="block"><div class="address"><strong>Адрес площадки:</strong> ${h(e.address.replace('Севастополь, ', ''))}</div><iframe class="map-frame" src="https://yandex.ru/map-widget/v1/?mode=search&text=${encodeURIComponent(e.address)}" loading="lazy"></iframe><button class="route-link" data-route="${e.id}">Построить маршрут</button></section>
-    </section>
-    <div class="ticket-bar"><button class="ticket-btn" data-ticket="${e.id}">Купить билет</button></div>
-  </div>`;
-}
-function renderReviews() {
-  const e = byId(state.current) || EVENTS[0];
-  const reviews = state.reviews[e.id] || [];
-  const countReviews = reviews.length || (e.rating ? 1 : 0);
-  const avg = reviews.length ? Math.round(reviews.reduce((s, r) => s + r.rating, 0) / reviews.length) : e.rating;
-  const sample = e.rating && !reviews.length ? [{name: 'Олег', rating: e.rating, text: 'Отличное событие, очень понравилось.'}] : reviews;
-  view.innerHTML = `<div class="reviews-page">
-    <button class="back-floating" data-back-detail>‹</button>
-    <h1>Отзывы</h1><div class="description">${h(e.title)}</div>
-    <div class="rating-summary"><div><div class="rating-num">${avg || 0}</div><div class="stars">${avg ? '★'.repeat(avg) : '☆'}</div><div class="review-sub">${countReviews} ${plural(countReviews, 'отзыв', 'отзыва', 'отзывов')}</div></div><div>${[5,4,3,2,1].map(n => `<div class="bar"><span>${n}</span><span class="bar-line"><span class="bar-fill" style="width:${n === avg ? 100 : 0}%"></span></span></div>`).join('')}</div></div>
-    <div class="events-list">${sample.map(r => `<article class="review-card"><div class="avatar-mini">${h((r.name || 'О')[0])}</div><div><div class="review-name">${h(r.name || 'Олег')}</div><div class="review-sub">Сегодня</div><div class="stars">${'★'.repeat(r.rating)}</div><div class="review-body">${h(r.text)}</div></div></article>`).join('')}</div>
-    <button class="pill" style="width:100%;margin-top:18px" data-open-review="${e.id}">Оставить отзыв</button>
-  </div>`;
-}
-function setNav() {
-  bottomNav.style.display = ['detail', 'reviews'].includes(state.tab) ? 'none' : 'grid';
-  bottomNav.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === state.tab));
-}
-function render() {
-  setNav();
-  if (state.tab === 'home') renderHome();
-  if (state.tab === 'favorites') renderFavorites();
-  if (state.tab === 'subscriptions') renderSubscriptions();
-  if (state.tab === 'detail') renderDetail();
-  if (state.tab === 'reviews') renderReviews();
-}
 
-function openDatePicker() {
-  const today = moscowToday();
-  let month = new Date(today.getFullYear(), today.getMonth(), 1);
-  function draw() {
-    const startMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const y = month.getFullYear(), m = month.getMonth();
-    const first = (new Date(y, m, 1).getDay() + 6) % 7;
-    const days = new Date(y, m + 1, 0).getDate();
-    const prevDays = new Date(y, m, 0).getDate();
-    const cells = [];
-    for (let i = 0; i < 42; i++) {
-      let num, date, other = false;
-      if (i < first) { num = prevDays - first + i + 1; date = new Date(y, m - 1, num); other = true; }
-      else if (i >= first + days) { num = i - first - days + 1; date = new Date(y, m + 1, num); other = true; }
-      else { num = i - first + 1; date = new Date(y, m, num); }
-      const disabled = date < today;
-      const active = iso(date) === state.date;
-      cells.push(`<button class="day ${other ? 'other' : ''} ${disabled ? 'disabled' : ''} ${active ? 'active' : ''}" data-pick-date="${iso(date)}">${num}</button>`);
+  const STORAGE = 'afisha_sevastopol_state_v3';
+  const MS_DAY = 86400000;
+
+  const venues = [
+    'Все площадки',
+    'Севастопольский театр юного зрителя',
+    'Театр им. Луначарского',
+    'Севастопольский академический русский драматический театр',
+    'Дворец культуры рыбаков',
+    'Музей-заповедник Херсонес Таврический',
+    'Севастопольский центр культуры и искусств',
+    'Кинотеатр Москва'
+  ];
+
+  const baseEvents = [
+    {
+      id:'first-russia', offset:0, time:'10:00', allDay:false,
+      title:'Выставка «Первый в России»', venue:'Музей-заповедник Херсонес Таврический', address:'Севастополь, Древняя улица, 1',
+      image:'https://images.unsplash.com/photo-1518998053901-5348d3961a04?auto=format&fit=crop&w=500&q=80', rating:5,
+      desc:'Выставочный проект о людях и событиях, которые стали первыми в истории. Экспозиция объединяет архивные материалы, редкие фотографии, документы и предметы из музейной коллекции.'
+    },
+    {
+      id:'walk', offset:0, time:'11:00', allDay:false,
+      title:'Пешеходная экскурсия для сборных групп по Севастополю', venue:'Севастопольский центр культуры и искусств', address:'Севастополь, улица Ленина, 25',
+      image:'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=500&q=80', rating:0,
+      desc:'Прогулка по историческому центру города с рассказом о памятниках, площадях, архитектуре и людях, которые формировали облик Севастополя.'
+    },
+    {
+      id:'heart', offset:0, time:'11:00', allDay:false,
+      title:'Вафельное сердце', venue:'Севастопольский театр юного зрителя', address:'Севастополь, проспект Победы, 9',
+      image:'https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=500&q=80', rating:0,
+      desc:'Трогательный спектакль для всей семьи о дружбе, взрослении и маленьких чудесах, которые случаются рядом с теми, кто умеет верить.'
+    },
+    {
+      id:'backstage', offset:0, time:'12:00', allDay:false,
+      title:'Путешествие по закулисью', venue:'Севастопольский театр юного зрителя', address:'Севастополь, проспект Победы, 9',
+      image:'https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=500&q=80', rating:0,
+      desc:'6+ Рекомендуемый возраст: 6+. Продолжительность экскурсии: 1 час. Хотите попасть в сказочный мир закулисья театра? У вас есть уникальная возможность своими глазами увидеть театр изнутри, узнать множество театральных легенд и секретов, прогуляться по мастерским, где работают настоящие волшебники сцены.'
+    },
+    {
+      id:'queen', offset:1, time:'16:00', allDay:false,
+      title:'Пиковая дама', venue:'Театр им. Луначарского', address:'Севастополь, проспект Нахимова, 6',
+      image:'https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=500&q=80', rating:5,
+      desc:'Сценическая версия знаменитой повести о страсти, судьбе и цене одной тайны. Классический сюжет раскрывается через напряженную атмосферу и сильную актерскую игру.'
+    },
+    {
+      id:'gallery', offset:1, time:'17:00', allDay:false,
+      title:'Диалоги в искусстве: художник, зритель и город', venue:'Севастопольский центр культуры и искусств', address:'Севастополь, улица Ленина, 25',
+      image:'https://images.unsplash.com/photo-1545987796-200677ee1011?auto=format&fit=crop&w=500&q=80', rating:0,
+      desc:'Встреча о современном искусстве, городских сюжетах и том, как зритель становится участником художественного разговора.'
+    },
+    {
+      id:'hanuma', offset:1, time:'18:00', allDay:false,
+      title:'«Ханума»', venue:'Севастопольский академический русский драматический театр', address:'Севастополь, проспект Нахимова, 6',
+      image:'https://images.unsplash.com/photo-1515165562835-c3b8c2d9f675?auto=format&fit=crop&w=500&q=80', rating:5,
+      desc:'Спектакль «Ханума» — всем известная история о соперничестве двух свах, блестяще воплощенная на сцене. События разворачиваются в старинном городе, где интрига, юмор и музыка соединяются в живой и яркий театральный праздник.'
+    },
+    {
+      id:'ussr', offset:1, time:'20:00', allDay:false,
+      title:'«Елка Весна СССР»', venue:'Дворец культуры рыбаков', address:'Севастополь, улица Павла Корчагина, 1',
+      image:'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=500&q=80', rating:0,
+      desc:'Музыкальная программа с атмосферой ретро, любимыми мелодиями и живыми историями о времени, которое многие помнят с теплом.'
+    },
+    {
+      id:'heroes', offset:3, time:'09:00', allDay:true,
+      title:'Выставка «Герои Севастополя»', venue:'Музей-заповедник Херсонес Таврический', address:'Севастополь, Древняя улица, 1',
+      image:'https://images.unsplash.com/photo-1566127992631-137a642a90f4?auto=format&fit=crop&w=500&q=80', rating:0,
+      desc:'Экспозиция о людях, связанных с историей города, военной славой и культурной памятью Севастополя.'
+    },
+    {
+      id:'virtuoso', offset:3, time:'10:00', allDay:true,
+      title:'Виртуоз', venue:'Севастопольский центр культуры и искусств', address:'Севастополь, улица Ленина, 25',
+      image:'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=500&q=80', rating:0,
+      desc:'Музыкальная программа с произведениями классики и современными аранжировками.'
+    },
+    {
+      id:'book', offset:3, time:'10:30', allDay:true,
+      title:'Книжная выставка «Калейдоскоп историй»', venue:'Севастопольский центр культуры и искусств', address:'Севастополь, улица Ленина, 25',
+      image:'https://images.unsplash.com/photo-1519682337058-a94d519337bc?auto=format&fit=crop&w=500&q=80', rating:0,
+      desc:'Подборка книг, изданий и редких материалов для любителей истории, литературы и краеведения.'
+    },
+    {
+      id:'cinema', offset:3, time:'18:30', allDay:false,
+      title:'Кинопоказ под открытым небом', venue:'Кинотеатр Москва', address:'Севастополь, проспект Генерала Острякова, 70',
+      image:'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=500&q=80', rating:0,
+      desc:'Вечерний показ фильма с обсуждением после сеанса.'
     }
-    overlayRoot.innerHTML = `<div class="overlay"><div class="sheet calendar"><div class="cal-head"><button data-prev-month ${month <= startMonth ? 'style="opacity:.25;pointer-events:none"' : ''}>‹</button><div class="cal-title">${MONTHS_NOM[m]} ${y} г.</div><button data-next-month>›</button></div><div class="cal-grid">${['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(w => `<div class="week">${w}</div>`).join('')}${cells.join('')}</div></div></div>`;
-    overlayRoot.querySelector('[data-prev-month]')?.addEventListener('click', () => { month = new Date(y, m - 1, 1); draw(); });
-    overlayRoot.querySelector('[data-next-month]').addEventListener('click', () => { month = new Date(y, m + 1, 1); draw(); });
-    overlayRoot.querySelectorAll('[data-pick-date]').forEach(b => b.addEventListener('click', () => { state.date = b.dataset.pickDate; save(); closeOverlay(); state.tab = 'home'; render(); }));
-  }
-  draw();
-}
-function openVenuePicker() {
-  overlayRoot.innerHTML = `<div class="overlay"><div class="sheet">${venues.map(v => `<button class="option ${v === state.venue ? 'active' : ''}" data-pick-venue="${h(v)}"><span>${h(v)}</span><span>${v === state.venue ? '✓' : ''}</span></button>`).join('')}</div></div>`;
-}
-function closeOverlay() { overlayRoot.innerHTML = ''; }
-function openReviewModal(id) {
-  const e = byId(id); let rating = 0;
-  overlayRoot.innerHTML = `<div class="overlay review-modal"><div class="review-box"><button class="close" data-close>×</button><div class="avatar-big">О</div><h2>Отзыв</h2><div class="muted">Олег</div><div class="muted">${h(e.title)}</div><div class="stars-input">${[1,2,3,4,5].map(n => `<button class="star-btn" data-rate="${n}">★</button>`).join('')}</div><div class="rating-label">Нажмите для оценки</div><textarea class="review-text" placeholder="Поделитесь впечатлениями..."></textarea><button class="send-review" disabled>Отправить</button></div></div>`;
-  const stars = Array.from(overlayRoot.querySelectorAll('[data-rate]'));
-  const label = overlayRoot.querySelector('.rating-label');
-  const text = overlayRoot.querySelector('.review-text');
-  const send = overlayRoot.querySelector('.send-review');
-  function update() { stars.forEach(s => s.classList.toggle('active', Number(s.dataset.rate) <= rating)); label.textContent = rating === 5 ? 'В восторге' : rating ? `${rating} из 5` : 'Нажмите для оценки'; send.disabled = !(rating && text.value.trim()); }
-  stars.forEach(s => s.addEventListener('click', () => { rating = Number(s.dataset.rate); update(); }));
-  text.addEventListener('input', update);
-  send.addEventListener('click', () => { state.reviews[id] ||= []; state.reviews[id].push({name: 'Олег', rating, text: text.value.trim()}); save(); closeOverlay(); state.current = id; state.tab = 'reviews'; render(); window.scrollTo(0,0); });
-}
+  ];
 
-document.addEventListener('click', (ev) => {
-  const el = ev.target.closest('[data-tab],[data-action],[data-event],[data-fav],[data-sub],[data-back],[data-back-detail],[data-expand],[data-reviews],[data-help],[data-ticket],[data-route],[data-open-review],[data-pick-venue],[data-set-date],[data-close]');
-  if (!el) return;
-  if (el.dataset.tab) { state.tab = el.dataset.tab; render(); window.scrollTo(0,0); }
-  if (el.dataset.action === 'date') openDatePicker();
-  if (el.dataset.action === 'venue') openVenuePicker();
-  if (el.dataset.pickVenue) { state.venue = el.dataset.pickVenue; save(); closeOverlay(); state.tab = 'home'; render(); }
-  if (el.dataset.setDate) { state.date = el.dataset.setDate; save(); render(); }
-  if (el.dataset.event) { state.current = el.dataset.event; state.tab = 'detail'; state.expanded = false; save(); render(); window.scrollTo(0,0); }
-  if (el.dataset.fav) { ev.stopPropagation(); const id = el.dataset.fav; state.favorites = isFav(id) ? state.favorites.filter(x => x !== id) : [...state.favorites, id]; save(); render(); }
-  if (el.dataset.sub) { ev.stopPropagation(); const id = el.dataset.sub; state.subscriptions = isSub(id) ? state.subscriptions.filter(x => x !== id) : [...state.subscriptions, id]; save(); render(); }
-  if (el.dataset.back) { state.tab = 'home'; render(); window.scrollTo(0,0); }
-  if (el.dataset.backDetail) { state.tab = 'detail'; render(); window.scrollTo(0,0); }
-  if (el.dataset.expand !== undefined) { state.expanded = !state.expanded; render(); }
-  if (el.dataset.reviews) { state.current = el.dataset.reviews; state.tab = 'reviews'; render(); window.scrollTo(0,0); }
-  if (el.dataset.openReview) openReviewModal(el.dataset.openReview);
-  if (el.dataset.help !== undefined) alert('Добавьте событие в избранное или подпишитесь на новые даты.');
-  if (el.dataset.ticket) { const e = byId(el.dataset.ticket); window.open(e.ticketUrl, '_blank'); }
-  if (el.dataset.route) { const e = byId(el.dataset.route); window.open(`https://yandex.ru/maps/?rtext=~${encodeURIComponent(e.address)}&rtt=auto`, '_blank'); }
-  if (el.dataset.close !== undefined) closeOverlay();
-});
-overlayRoot.addEventListener('click', (ev) => { if (ev.target.classList.contains('overlay')) closeOverlay(); });
-try { window.WebApp?.ready?.(); window.WebApp?.expand?.(); } catch {}
-render();
+  const state = Object.assign({ tab:'home', date:'all', venue:'Все площадки', current:null, favorites:[], subscriptions:[], reviews:{}, expanded:false }, loadState());
+
+  const icons = {
+    calendar:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+    pin:'<svg viewBox="0 0 24 24"><path d="M12 21s7-5.2 7-12A7 7 0 0 0 5 9c0 6.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg>',
+    clock:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    heart:'<svg class="icon-heart" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.5-9.4-10A5.4 5.4 0 0 1 12 5.8 5.4 5.4 0 0 1 21.4 11C19.5 16.5 12 21 12 21z"/></svg>',
+    bell:'<svg class="icon-bell" viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9zM10 21h4"/></svg>'
+  };
+
+  function loadState(){ try { return JSON.parse(localStorage.getItem(STORAGE) || '{}'); } catch { return {}; } }
+  function saveState(){ localStorage.setItem(STORAGE, JSON.stringify({ date:state.date, venue:state.venue, favorites:state.favorites, subscriptions:state.subscriptions, reviews:state.reviews })); }
+  function escapeHtml(v){ return String(v ?? '').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])); }
+  function moscowToday(){ const parts = new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Moscow',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()); const y=+parts.find(p=>p.type==='year').value; const m=+parts.find(p=>p.type==='month').value-1; const d=+parts.find(p=>p.type==='day').value; return new Date(y,m,d); }
+  function addDays(date,n){ const d=new Date(date); d.setDate(d.getDate()+n); return d; }
+  function iso(date){ return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`; }
+  function todayIso(){ return iso(moscowToday()); }
+  function formatDay(date){ return new Intl.DateTimeFormat('ru-RU',{timeZone:'Europe/Moscow',day:'numeric',month:'long'}).format(date); }
+  function week(date){ return new Intl.DateTimeFormat('ru-RU',{timeZone:'Europe/Moscow',weekday:'long'}).format(date); }
+  function relTitle(date){ const t=moscowToday(); const diff=Math.round((new Date(date.getFullYear(),date.getMonth(),date.getDate())-t)/MS_DAY); if(diff===0) return ['Сегодня', formatDay(date)]; if(diff===1) return ['Завтра', formatDay(date)]; if(diff===2) return ['Послезавтра', formatDay(date)]; return [formatDay(date), week(date)]; }
+  function plural(n,a,b,c){ n=Math.abs(n)%100; const n1=n%10; if(n>10&&n<20)return c; if(n1>1&&n1<5)return b; if(n1===1)return a; return c; }
+  function events(){ const today = moscowToday(); return baseEvents.map(e => ({...e, date: iso(addDays(today, e.offset))})); }
+  function byId(id){ return events().find(e => e.id === id); }
+  function isFav(id){ return state.favorites.includes(id); }
+  function isSub(id){ return state.subscriptions.includes(id); }
+  function toggle(arr,id){ const i=arr.indexOf(id); if(i>=0) arr.splice(i,1); else arr.push(id); saveState(); }
+
+  function filtersHtml(){
+    const dateText = state.date === 'all' ? 'Выберите дату' : formatDay(new Date(state.date + 'T00:00:00'));
+    return `<section class="filters">
+      <button class="filter-btn" data-action="date">${icons.calendar}<span>${escapeHtml(dateText)}</span></button>
+      <button class="filter-btn" data-action="venue">${icons.pin}<span>${escapeHtml(state.venue)}</span></button>
+    </section>`;
+  }
+
+  function filtered(){
+    return events().filter(e => (state.date === 'all' || e.date === state.date) && (state.venue === 'Все площадки' || e.venue === state.venue)).sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
+  }
+  function groupByDate(list){ return list.reduce((acc,e)=>{ (acc[e.date] ||= []).push(e); return acc; },{}); }
+  function placeHtml(v){ return `<div class="place">${icons.pin}<span>${escapeHtml(v)}</span></div>`; }
+  function eventCard(e){
+    return `<article class="event" data-open="${e.id}">
+      <img class="event-img" src="${e.image}" alt="">
+      <div class="event-content">
+        <div class="event-time">${escapeHtml(e.time)}</div>
+        <button class="event-action ${isFav(e.id)?'active':''}" data-fav="${e.id}" aria-label="Избранное">${icons.heart}</button>
+        <div class="event-title">${escapeHtml(e.title)}</div>
+        ${placeHtml(e.venue)}
+      </div>
+    </article>`;
+  }
+  function featureCard(e){ return `<article class="feature" data-open="${e.id}"><img src="${e.image}" alt=""><div class="feature-body"><div class="feature-title">${escapeHtml(e.title)}</div>${placeHtml(e.venue)}</div></article>`; }
+
+  function renderHome(){
+    const groups=groupByDate(filtered());
+    const content = Object.keys(groups).map(dateIso=>{
+      const d=new Date(dateIso+'T00:00:00'); const [main,sub]=relTitle(d); const list=groups[dateIso]; const all=list.filter(e=>e.allDay); const timed=list.filter(e=>!e.allDay);
+      return `<section class="day-block">
+        <div class="day-title">${escapeHtml(main)} <span class="sub">${escapeHtml(sub)}</span></div>
+        <button class="all-day"><span class="clock">${icons.clock}</span><span><div class="all-day-title">Весь день</div><div class="all-day-count">${list.length} ${plural(list.length,'мероприятие','мероприятия','мероприятий')}</div></span><span class="counter">${list.length}</span><span class="chev">⌄</span></button>
+        ${all.length ? `<div class="featured">${all.map(featureCard).join('')}</div>` : ''}
+        <div class="events">${timed.map(eventCard).join('')}</div>
+      </section>`;
+    }).join('') || `<div class="empty">На выбранную дату и площадку мероприятий пока нет</div>`;
+    app.innerHTML = filtersHtml() + `<div class="screen">${content}</div>`;
+  }
+
+  function renderFavorites(){
+    const list=events().filter(e=>isFav(e.id)); const groups=groupByDate(list);
+    const content = list.length ? Object.keys(groups).map(d=>{ const [m,s]=relTitle(new Date(d+'T00:00:00')); return `<section class="day-block"><div class="day-title">${escapeHtml(m)} <span class="sub">${escapeHtml(s)}</span></div><div class="events">${groups[d].map(eventCard).join('')}</div></section>`; }).join('') : '<div class="empty">Вы пока ничего не добавили в избранное</div>';
+    app.innerHTML = filtersHtml() + `<div class="screen"><section class="intro"><h1>Ваш список избранных мероприятий</h1><p>Даты, которые вы сохранили, чтобы не потерять среди общей ленты</p></section>${content}</div>`;
+  }
+
+  function renderSubscriptions(){
+    const list=events().filter(e=>isSub(e.id));
+    const content = list.length ? list.map(e=>`<article class="sub-card"><div class="sub-head" data-open="${e.id}"><img src="${e.image}" alt=""><div><div class="sub-title">${escapeHtml(e.title)}</div>${placeHtml(e.venue)}</div><button class="active" data-sub="${e.id}">${icons.bell}</button></div><div class="sub-dates"><div class="sub-row"><span>${formatDay(new Date(e.date+'T00:00:00'))}<small>${relTitle(new Date(e.date+'T00:00:00'))[0].toLowerCase()}</small></span><span class="active">${icons.heart}</span><span class="sub-time">${e.time}</span></div><div class="sub-row"><span>${formatDay(addDays(new Date(e.date+'T00:00:00'),23))}<small>${week(addDays(new Date(e.date+'T00:00:00'),23))}</small></span><span></span><span class="sub-time">17:00</span></div></div></article>`).join('') : '<div class="empty">Подписок пока нет</div>';
+    app.innerHTML = filtersHtml() + `<div class="screen"><section class="intro"><h1>Список подписок</h1><p>Вы получите уведомление, когда организатор добавит новые даты</p></section>${content}</div>`;
+  }
+
+  function renderDetail(){
+    const e=byId(state.current) || events()[0]; const d=new Date(e.date+'T00:00:00'); const reviews=state.reviews[e.id]||[]; const avg=reviews.length ? Math.round(reviews.reduce((s,r)=>s+r.rating,0)/reviews.length) : e.rating; const [rel]=relTitle(d);
+    const desc = state.expanded ? e.desc : e.desc.length > 230 ? e.desc.slice(0,230) + '...' : e.desc;
+    tabbar.hidden = true;
+    app.classList.add('detail');
+    app.innerHTML = `<button class="back" data-back>‹</button>
+      <section class="hero"><img src="${e.image}" alt=""></section>
+      <section class="detail-body">
+        <h1 class="detail-title">${escapeHtml(e.title)}</h1>
+        <div class="detail-date">${escapeHtml(rel)} в ${escapeHtml(e.time)}</div>
+        <div class="detail-place">${icons.pin}<span>${escapeHtml(e.venue)}</span><span>›</span></div>
+        <div class="actions"><button class="pill ${isFav(e.id)?'active':''}" data-fav="${e.id}">${icons.heart}<span>${isFav(e.id)?'В избранном':'Избранное'}</span></button><button class="pill ${isSub(e.id)?'active':''}" data-sub="${e.id}">${icons.bell}<span>${isSub(e.id)?'Подписаться':'Подписаться'}</span></button><button class="pill" data-help>?</button></div>
+        <div class="divider"></div>
+        <section class="block"><h2>О событии</h2><div class="desc">${escapeHtml(desc)}</div>${e.desc.length>230?`<button class="link-btn" data-expand>${state.expanded?'Свернуть ^':'Читать далее ›'}</button>`:''}</section>
+        <button class="review-link" data-reviews="${e.id}"><span class="review-num">${avg || '☆'}</span><span class="star-yellow">${avg?'★':'☆'}</span><span><span class="review-title">${avg || reviews.length ? 'Отзывы':'Отзывов пока нет'}</span><span class="review-sub">${reviews.length ? `${reviews.length} ${plural(reviews.length,'отзыв','отзыва','отзывов')}` : 'Будьте первым, кто оставит отзыв'}</span></span><span>›</span></button>
+        <section class="block"><h2>Также доступны другие даты:</h2><div class="date-option"><span>${formatDay(addDays(d,23))}, 17:00</span><span class="ticket-small">Билеты</span><button class="${isFav(e.id)?'active':''}" data-fav="${e.id}">${icons.heart}</button></div></section>
+        <section class="block"><div class="address"><strong>Адрес площадки:</strong> ${escapeHtml(e.address.replace('Севастополь, ',''))}</div><iframe class="map" src="https://yandex.ru/map-widget/v1/?mode=search&text=${encodeURIComponent(e.address)}" loading="lazy"></iframe></section>
+      </section><div class="ticketbar"><button class="ticket" data-ticket="${e.id}">Купить билет</button></div>`;
+  }
+
+  function renderReviews(){
+    const e=byId(state.current) || events()[0]; const reviews=state.reviews[e.id]||[]; const avg=reviews.length ? Math.round(reviews.reduce((s,r)=>s+r.rating,0)/reviews.length) : e.rating;
+    tabbar.hidden = true; app.classList.remove('detail');
+    app.innerHTML = `<div class="reviews-page"><button class="back" data-back>‹</button><h1>Отзывы</h1><div class="desc">${escapeHtml(e.title)}</div><div class="rating-summary"><div><div class="rating-num">${avg||0}</div><div class="stars">${'★'.repeat(avg||0)}</div><div class="review-sub">${reviews.length || (avg?1:0)} ${plural(reviews.length || (avg?1:0),'отзыв','отзыва','отзывов')}</div></div><div>${[5,4,3,2,1].map(n=>`<div class="bar"><span>${n}</span><div class="bar-line"><div class="bar-fill" style="width:${n===avg?100:0}%"></div></div></div>`).join('')}</div></div><button class="pill" data-open-review="${e.id}">Оставить отзыв</button><div class="events">${reviews.map(r=>`<article class="review-card"><div class="avatar">${escapeHtml((r.name||'О')[0])}</div><div><div class="review-name">${escapeHtml(r.name||'Олег')}</div><div class="review-sub">Сегодня</div><div class="stars">${'★'.repeat(r.rating)}</div><div class="review-text">${escapeHtml(r.text)}</div></div></article>`).join('')}</div></div>`;
+  }
+
+  function render(){
+    app.classList.remove('detail'); tabbar.hidden = false;
+    document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===state.tab));
+    if(state.tab==='home') renderHome();
+    if(state.tab==='favorites') renderFavorites();
+    if(state.tab==='subscriptions') renderSubscriptions();
+    if(state.tab==='detail') renderDetail();
+    if(state.tab==='reviews') renderReviews();
+  }
+
+  function openDatePicker(){
+    const shade=document.createElement('div'); shade.className='shade'; document.body.appendChild(shade);
+    const today=moscowToday(); let month=new Date(today.getFullYear(),today.getMonth(),1);
+    const picker=document.createElement('div'); picker.className='picker'; document.body.appendChild(picker);
+    function draw(){
+      const y=month.getFullYear(), m=month.getMonth(); const first=(new Date(y,m,1).getDay()+6)%7; const days=new Date(y,m+1,0).getDate(); const prevDays=new Date(y,m,0).getDate(); let cells='';
+      for(let i=0;i<42;i++){ let dnum, cd, cls=''; if(i<first){dnum=prevDays-first+i+1; cd=new Date(y,m-1,dnum); cls='other';} else if(i>=first+days){dnum=i-first-days+1; cd=new Date(y,m+1,dnum); cls='other';} else {dnum=i-first+1; cd=new Date(y,m,dnum);} const disabled=cd<today; const val=iso(cd); if(disabled) cls+=' disabled'; if(val===state.date) cls+=' active'; if(val===todayIso()) cls+=' today'; cells+=`<button class="day ${cls}" data-pick="${val}">${dnum}</button>`; }
+      picker.innerHTML=`<div class="picker-head"><button data-prev>‹</button><div class="month-title">${new Intl.DateTimeFormat('ru-RU',{month:'long',year:'numeric'}).format(month)}</div><button data-next>›</button></div><div class="week"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span></div><div class="days">${cells}</div>`;
+    }
+    function close(){ picker.remove(); shade.remove(); }
+    picker.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b)return; if(b.dataset.prev!==undefined){ month=new Date(month.getFullYear(),month.getMonth()-1,1); draw(); } if(b.dataset.next!==undefined){ month=new Date(month.getFullYear(),month.getMonth()+1,1); draw(); } if(b.dataset.pick){ state.date=b.dataset.pick; saveState(); close(); render(); }});
+    shade.addEventListener('click', close); draw();
+  }
+
+  function openVenueList(){
+    const shade=document.createElement('div'); shade.className='shade'; document.body.appendChild(shade);
+    const list=document.createElement('div'); list.className='venue-list'; list.innerHTML=venues.map(v=>`<button class="venue-item ${v===state.venue?'active':''}" data-venue="${escapeHtml(v)}"><span>${escapeHtml(v)}</span><span>${v===state.venue?'✓':''}</span></button>`).join(''); document.body.appendChild(list);
+    function close(){ list.remove(); shade.remove(); }
+    list.addEventListener('click',e=>{ const b=e.target.closest('[data-venue]'); if(!b)return; state.venue=b.dataset.venue; saveState(); close(); render(); }); shade.addEventListener('click', close);
+  }
+
+  function openReviewModal(id){
+    const e=byId(id); let rating=0;
+    modal.hidden=false; modal.innerHTML=`<div class="review-modal"><button class="modal-close" data-close>×</button><h2>Отзыв</h2><div class="review-event">${escapeHtml(e.title)}</div><div class="stars-input">${[1,2,3,4,5].map(n=>`<button class="star-btn" data-rate="${n}">★</button>`).join('')}</div><div class="rating-word">Нажмите для оценки</div><textarea placeholder="Поделитесь впечатлениями..."></textarea><button class="send-review" disabled>Отправить</button></div>`;
+    const update=()=>{ modal.querySelectorAll('.star-btn').forEach(b=>b.classList.toggle('active', +b.dataset.rate<=rating)); modal.querySelector('.rating-word').textContent = rating===5?'В восторге':rating===4?'Очень хорошо':rating===3?'Нормально':rating===2?'Не очень':'Нажмите для оценки'; modal.querySelector('.send-review').disabled = !rating || !modal.querySelector('textarea').value.trim(); };
+    modal.addEventListener('input', update, {once:false});
+    modal.onclick=(ev)=>{ const rate=ev.target.closest('[data-rate]'); if(rate){ rating=+rate.dataset.rate; update(); } if(ev.target.closest('[data-close]')||ev.target===modal){ modal.hidden=true; modal.innerHTML=''; } if(ev.target.closest('.send-review')&&!ev.target.closest('.send-review').disabled){ const text=modal.querySelector('textarea').value.trim(); (state.reviews[id] ||= []).push({name:'Олег',rating,text}); saveState(); modal.hidden=true; modal.innerHTML=''; state.tab='reviews'; render(); }};
+  }
+
+  tabbar.addEventListener('click', e=>{ const b=e.target.closest('[data-tab]'); if(!b)return; state.tab=b.dataset.tab; state.expanded=false; render(); });
+  app.addEventListener('click', e=>{
+    const fav=e.target.closest('[data-fav]'); if(fav){ e.stopPropagation(); toggle(state.favorites, fav.dataset.fav); render(); return; }
+    const sub=e.target.closest('[data-sub]'); if(sub){ e.stopPropagation(); toggle(state.subscriptions, sub.dataset.sub); render(); return; }
+    const open=e.target.closest('[data-open]'); if(open){ state.current=open.dataset.open; state.tab='detail'; state.expanded=false; render(); window.scrollTo(0,0); return; }
+    if(e.target.closest('[data-action="date"]')){ openDatePicker(); return; }
+    if(e.target.closest('[data-action="venue"]')){ openVenueList(); return; }
+    if(e.target.closest('[data-back]')){ state.tab='home'; state.expanded=false; render(); return; }
+    if(e.target.closest('[data-expand]')){ state.expanded=!state.expanded; render(); return; }
+    const rev=e.target.closest('[data-reviews]'); if(rev){ state.current=rev.dataset.reviews; state.tab='reviews'; render(); return; }
+    const openRev=e.target.closest('[data-open-review]'); if(openRev){ openReviewModal(openRev.dataset.openReview); return; }
+    const ticket=e.target.closest('[data-ticket]'); if(ticket){ const ev=byId(ticket.dataset.ticket); window.open(`https://yandex.ru/maps/?rtext=~${encodeURIComponent(ev.address)}&rtt=auto`, '_blank'); }
+  });
+
+  window.addEventListener('error', (event) => { console.error(event.error || event.message); app.innerHTML = `<div class="empty">Ошибка загрузки интерфейса. Обновите mini app.</div>`; });
+  render();
+})();
