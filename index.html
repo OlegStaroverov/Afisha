@@ -4,49 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Афиша Севастополя</title>
-  <meta name="theme-color" content="#202026" />
+  <meta name="theme-color" content="#222326" />
   <link rel="stylesheet" href="./styles.css" />
   <script src="https://st.max.ru/js/max-web-app.js"></script>
 </head>
 <body>
   <div id="app" class="app">
-    <header class="topbar">
-      <button id="backBtn" class="top-icon close-icon" aria-label="Назад">×</button>
-      <div class="top-title"><span id="pageTitle">Афиша Севастополя</span><span class="verify">✓</span></div>
-      <button id="menuBtn" class="top-icon" aria-label="Меню">•••</button>
-    </header>
-
-    <section id="filters" class="filters-card">
-      <button id="dateBtn" class="filter-line" type="button">
-        <span class="filter-ico">▣</span>
-        <span id="dateText">Выберите дату</span>
-      </button>
-      <button id="venueBtn" class="filter-line" type="button">
-        <span class="filter-ico">⌖</span>
-        <span id="venueText">Все площадки</span>
-      </button>
-      <div id="dropdownRoot"></div>
-    </section>
-
     <main id="view" class="view"></main>
-
-    <nav class="tabbar">
-      <button class="tab active" data-tab="home" aria-label="Главная">
-        <svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5v8a1 1 0 0 1-1 1h-5.5v-6h-5v6H4a1 1 0 0 1-1-1z"/></svg>
-        <i></i>
-      </button>
-      <button class="tab" data-tab="favorites" aria-label="Избранное">
-        <svg viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.7-9.3-9.3C1.4 7.8 3.4 5 6.6 5c1.8 0 3.4 1 4.2 2.4C11.6 6 13.2 5 15 5c3.2 0 5.2 2.8 3.9 6.2C17.1 15.8 12 20.5 12 20.5z"/></svg>
-        <i></i>
-      </button>
-      <button class="tab" data-tab="subs" aria-label="Подписки">
-        <svg viewBox="0 0 24 24"><path d="M18 16v-5a6 6 0 0 0-12 0v5l-2 2h16zM9 20h6"/></svg>
-        <i></i>
-      </button>
+    <nav class="bottom-nav" aria-label="Навигация">
+      <button class="nav-btn active" data-tab="home" aria-label="Главная"><span class="nav-icon">⌂</span></button>
+      <button class="nav-btn" data-tab="favorites" aria-label="Избранное"><span class="nav-icon">♡</span></button>
+      <button class="nav-btn" data-tab="subscriptions" aria-label="Подписки"><span class="nav-icon">♢</span></button>
     </nav>
   </div>
-
-  <div id="modalRoot"></div>
+  <div id="overlay"></div>
   <script src="./app.js"></script>
 </body>
 </html>
