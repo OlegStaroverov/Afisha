@@ -4,43 +4,52 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Афиша Севастополя</title>
-  <meta name="theme-color" content="#202027" />
+  <meta name="theme-color" content="#0b0f17" />
   <link rel="stylesheet" href="./styles.css" />
   <script src="https://st.max.ru/js/max-web-app.js"></script>
 </head>
 <body>
-  <div class="phone">
-    <header class="topbar">
-      <button id="closeBtn" class="top-icon" aria-label="Закрыть">×</button>
-      <button id="backBtn" class="top-icon back hidden" aria-label="Назад">‹</button>
-      <div class="title-wrap">
-        <h1 id="pageTitle">Афиша Севастополя</h1>
-        <span class="verified">✓</span>
+  <div id="app" class="app-shell">
+    <div class="status-spacer"></div>
+    <header class="app-header">
+      <div class="header-left">
+        <button id="headerBack" class="icon-btn hidden" aria-label="Назад">
+          <span>←</span>
+        </button>
+        <h1 id="appTitle">Афиша Севастополя</h1>
       </div>
-      <button class="top-icon dots" aria-label="Меню">•••</button>
+      <button id="menuButton" class="icon-btn" aria-label="Меню">
+        <span>⋯</span>
+      </button>
     </header>
 
-    <section id="filters" class="filters">
-      <button id="dateFilter" class="filter-btn"><span>▣</span><b>Выберите дату</b></button>
-      <button id="venueFilter" class="filter-btn"><span>⌖</span><b>Все площадки</b></button>
-    </section>
+    <main id="view" class="view"></main>
 
-    <main id="app" class="content"></main>
-
-    <nav class="tabbar">
-      <button class="tab active" data-tab="home" aria-label="Главная">
-        <span class="ico">⌂</span><i></i>
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-tab="home">
+        <span class="nav-icon">⌂</span>
+        
       </button>
-      <button class="tab" data-tab="favorites" aria-label="Избранное">
-        <span class="ico">♡</span><i></i>
+      <button class="nav-btn" data-tab="favorites">
+        <span class="nav-icon">♡</span>
+        
       </button>
-      <button class="tab" data-tab="subscriptions" aria-label="Подписки">
-        <span class="ico">♢</span><i></i>
+      <button class="nav-btn" data-tab="notifications">
+        <span class="nav-icon">🔔</span>
+        
       </button>
     </nav>
   </div>
 
-  <div id="modal"></div>
+  <div id="overlayRoot"></div>
+
+  <template id="loadingTemplate">
+    <section class="screen centered">
+      <div class="loader"></div>
+      <p class="muted">Загружаем мини-приложение…</p>
+    </section>
+  </template>
+
   <script src="./app.js"></script>
 </body>
 </html>

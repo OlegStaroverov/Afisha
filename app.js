@@ -1,125 +1,833 @@
-const now = new Date('2026-04-23T10:30:00');
-
 const EVENTS = [
-  {id:'e1',title:'Путешествие по закулисью',venue:'Государственный театр кукол',address:'проспект Победы 9, Севастополь',lat:44.5887,lon:33.5234,date:'2026-04-23',time:'11:00',age:'6+',image:'https://images.unsplash.com/photo-1607457561901-e6ec3a6d16cf?auto=format&fit=crop&w=900&q=80',summary:'Экскурсия в сказочный мир закулисья театра кукол.',description:'6+ Рекомендуемый возраст: 6+. Продолжительность экскурсии: 1 час. У вас есть уникальная возможность своими глазами увидеть театр кукол изнутри, узнать театральные легенды и секреты, прогуляться по мастерским, где работают артисты-кукловоды и специалисты театра.',ticketsUrl:'https://yandex.ru/maps/?text=Государственный театр кукол Севастополь',featured:false},
-  {id:'e2',title:'Ханума',venue:'Севастопольский театр драмы',address:'проспект Нахимова 6, Севастополь',lat:44.6149,lon:33.5238,date:'2026-04-24',time:'18:00',age:'12+',image:'https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=900&q=80',summary:'История о соперничестве двух свах, блестяще воплощенная на сцене.',description:'Спектакль «Ханума» — всем известная история о соперничестве двух свах, блестяще воплощенная на сцене. События разворачиваются в старинном Тифлисе, где каждый герой ищет свое счастье, любовь и выгоду. Легкая комедия, яркие характеры и музыкальная атмосфера делают постановку отличным выбором для вечера.',ticketsUrl:'https://yandex.ru/maps/?text=Севастопольский театр драмы',featured:true},
-  {id:'e3',title:'Выставка «Первый в России»',venue:'Музей обороны Севастополя',address:'Исторический бульвар, Севастополь',lat:44.6013,lon:33.5227,date:'2026-04-24',time:'10:00',age:'0+',image:'https://images.unsplash.com/photo-1566127992631-137a642a90f4?auto=format&fit=crop&w=900&q=80',summary:'Историческая выставка о людях и событиях, изменивших город.',description:'Экспозиция рассказывает о важных страницах истории Севастополя через документы, предметы быта, фотографии и редкие архивные материалы. Подходит для семейного посещения и спокойного музейного маршрута.',ticketsUrl:'https://yandex.ru/maps/?text=Музей обороны Севастополя',featured:true},
-  {id:'e4',title:'Пешеходная экскурсия по центру',venue:'Площадь Нахимова',address:'Площадь Нахимова, Севастополь',lat:44.6167,lon:33.5254,date:'2026-04-24',time:'11:00',age:'6+',image:'https://images.unsplash.com/photo-1568454537842-d933259bb258?auto=format&fit=crop&w=900&q=80',summary:'Маршрут по главным точкам города с гидом.',description:'Прогулка по центральной части Севастополя: площадь Нахимова, набережная, памятники, исторические здания и городские легенды. Удобный формат для гостей города и жителей, которые хотят взглянуть на привычные места иначе.',ticketsUrl:'https://yandex.ru/maps/?text=Площадь Нахимова Севастополь',featured:false},
-  {id:'e5',title:'Вафельное сердце',venue:'Театр юного зрителя',address:'улица Ленина 25, Севастополь',lat:44.6097,lon:33.5221,date:'2026-04-24',time:'11:00',age:'6+',image:'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=900&q=80',summary:'Добрый семейный спектакль о дружбе и взрослении.',description:'Трогательная история для детей и взрослых. Постановка говорит простым языком о важных вещах: доверии, поддержке, честности и умении слышать друг друга.',ticketsUrl:'https://yandex.ru/maps/?text=Театр юного зрителя Севастополь',featured:false},
-  {id:'e6',title:'Косточка',venue:'Театр юного зрителя',address:'улица Ленина 25, Севастополь',lat:44.6097,lon:33.5221,date:'2026-04-26',time:'11:00',age:'6+',image:'https://images.unsplash.com/photo-1585699324551-f6c309eedeca?auto=format&fit=crop&w=900&q=80',summary:'Театральная постановка для семейного посещения.',description:'Спектакль с теплой камерной атмосферой, где простая история раскрывается через выразительную игру актеров, свет и музыку.',ticketsUrl:'https://yandex.ru/maps/?text=Театр юного зрителя Севастополь',featured:false},
-  {id:'e7',title:'Картинная галерея. Избранное',venue:'Севастопольский художественный музей',address:'проспект Нахимова 9, Севастополь',lat:44.6154,lon:33.5249,date:'2026-04-26',time:'18:00',age:'0+',image:'',summary:'Классика музейной коллекции в одной экспозиции.',description:'Выставка знакомит с работами из постоянной коллекции музея. В маршруте собраны произведения разных эпох и направлений, которые помогают увидеть развитие художественной традиции.',ticketsUrl:'https://yandex.ru/maps/?text=Севастопольский художественный музей',featured:true},
-  {id:'e8',title:'Виртуоз',venue:'Картинная галерея',address:'проспект Нахимова 9, Севастополь',lat:44.6154,lon:33.5249,date:'2026-04-26',time:'12:00',age:'0+',image:'',summary:'Музыкальная программа в пространстве галереи.',description:'Небольшой концерт в музейном пространстве. Формат подходит для тех, кто любит спокойные культурные события без суеты.',ticketsUrl:'https://yandex.ru/maps/?text=Картинная галерея Севастополь',featured:true}
+  {
+    id: 'event-1',
+    title: 'Ночь коротких форм',
+    venue: 'Сцена Авангард',
+    city: 'Москва',
+    address: 'Кленовый проспект, 12',
+    date: '2026-04-26',
+    time: '19:00',
+    duration: '1 ч 40 мин',
+    age: '16+',
+    category: 'Театр',
+    image: 'https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=1200&q=80',
+    summary: 'Три короткие постановки в одном вечере. Живой свет, минималистичная сцена и камерная атмосфера.',
+    description: 'Это событие можно использовать как шаблон для вашей карточки. Здесь уже собрана правильная логика: крупная обложка, время, место, краткое описание, полная версия текста, отзывы и основное действие. Замените контент на свои мероприятия и подключите реальные данные с сервера.',
+    lat: 55.7431,
+    lon: 37.6057,
+    featured: true,
+    ticketsUrl: 'https://example.com/checkout/event-1'
+  },
+  {
+    id: 'event-2',
+    title: 'Маркет локальных брендов',
+    venue: 'Двор Мануфактура',
+    city: 'Москва',
+    address: 'Улица Светлая, 8',
+    date: '2026-04-26',
+    time: '12:00',
+    duration: 'Весь день',
+    age: '0+',
+    category: 'Маркет',
+    image: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80',
+    summary: 'Музыка, еда и независимые бренды в большом внутреннем дворе.',
+    description: 'Отличный пример события формата весь день. Его можно показывать в верхней подборке и в общем списке. По логике MAX mini app оно должно быстро открываться, добавляться в избранное и сохранять интерес пользователя через подписки на площадку или тему.',
+    lat: 55.7518,
+    lon: 37.6176,
+    featured: true,
+    ticketsUrl: 'https://example.com/checkout/event-2'
+  },
+  {
+    id: 'event-3',
+    title: 'Лекция о цифровом искусстве',
+    venue: 'Центр Форм',
+    city: 'Москва',
+    address: 'Линия Парк, 4',
+    date: '2026-04-27',
+    time: '18:30',
+    duration: '1 ч 20 мин',
+    age: '12+',
+    category: 'Лекция',
+    image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80',
+    summary: 'Разбор визуальных трендов и практики для современного digital-проекта.',
+    description: 'На карточке можно выводить организатора, программу, условия регистрации и ссылку на маршрут. Для MVP мы держим структуру легкой и быстрой: ничего лишнего, только нужные действия и правильная иерархия блоков.',
+    lat: 55.7601,
+    lon: 37.6189,
+    featured: false,
+    ticketsUrl: 'https://example.com/checkout/event-3'
+  },
+  {
+    id: 'event-4',
+    title: 'Кинопоказ под открытым небом',
+    venue: 'Летний Парк',
+    city: 'Москва',
+    address: 'Павильон 3, парк Северный',
+    date: '2026-04-27',
+    time: '21:00',
+    duration: '2 ч',
+    age: '18+',
+    category: 'Кино',
+    image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80',
+    summary: 'Большой экран, пледы и вечерняя программа на улице.',
+    description: 'Хороший кейс для вечернего сегмента. В списке такие события удобно группировать по времени, а в детальной карточке усиливать атмосферу крупной обложкой и четкой кнопкой действия.',
+    lat: 55.7664,
+    lon: 37.6382,
+    featured: false,
+    ticketsUrl: 'https://example.com/checkout/event-4'
+  },
+  {
+    id: 'event-5',
+    title: 'Тихий концерт при свечах',
+    venue: 'Зал Нота',
+    city: 'Москва',
+    address: 'Набережная, 21',
+    date: '2026-04-28',
+    time: '20:00',
+    duration: '1 ч 15 мин',
+    age: '6+',
+    category: 'Музыка',
+    image: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1200&q=80',
+    summary: 'Камерная программа в теплой визуальной сценографии.',
+    description: 'Для музыкальных событий можно усиливать эмоцию за счет крупной фотографии, понятного тайминга и короткого текстового блока без перегруза.',
+    lat: 55.7388,
+    lon: 37.5864,
+    featured: false,
+    ticketsUrl: 'https://example.com/checkout/event-5'
+  }
 ];
 
-const $ = (s) => document.querySelector(s);
-const app = $('#app');
-const modal = $('#modal');
-const pageTitle = $('#pageTitle');
-const filters = $('#filters');
-const backBtn = $('#backBtn');
-const closeBtn = $('#closeBtn');
-let state = {tab:'home', view:'home', selectedDate:null, selectedVenue:'Все площадки', opened:null, expanded:false};
-let store = loadStore();
+const VENUES = ['Все площадки', ...new Set(EVENTS.map((e) => e.venue))];
+const DATE_LABELS = {
+  all: 'Все даты',
+  '2026-04-26': '26 апреля',
+  '2026-04-27': '27 апреля',
+  '2026-04-28': '28 апреля'
+};
 
-function loadStore(){
-  try{return JSON.parse(localStorage.getItem('afisha-sev-store')||'{}')}catch{return {}}
-}
-function saveStore(){localStorage.setItem('afisha-sev-store',JSON.stringify(store))}
-function arr(key){return Array.isArray(store[key])?store[key]:[]}
-function toggle(key,id){const a=arr(key); store[key]=a.includes(id)?a.filter(x=>x!==id):[...a,id]; saveStore(); render()}
-function is(key,id){return arr(key).includes(id)}
-function fmtDate(iso){const d=new Date(iso+'T12:00:00'); return d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'})}
-function dayName(iso){const d=new Date(iso+'T12:00:00'); const today=new Date(now.toDateString()); const diff=(d-today)/86400000; if(diff===0)return 'Сегодня'; if(diff===1)return 'Завтра'; if(diff===2)return 'Послезавтра'; return fmtDate(iso)}
-function weekday(iso){return new Date(iso+'T12:00:00').toLocaleDateString('ru-RU',{weekday:'long'})}
-function byDate(){let list=[...EVENTS]; if(state.selectedDate) list=list.filter(e=>e.date===state.selectedDate); if(state.selectedVenue!=='Все площадки') list=list.filter(e=>e.venue===state.selectedVenue); return list.sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time))}
-function groups(list){return list.reduce((m,e)=>((m[e.date]??=[]).push(e),m),{})}
-function img(e,cls='poster'){return e.image?`<img class="${cls}" src="${e.image}" alt="${e.title}" loading="lazy">`:`<div class="${cls} empty-img"></div>`}
-function place(e){return `<div class="place"><b>⌖</b><span>${e.venue}</span></div>`}
-function routeUrl(e){return `https://yandex.ru/maps/?rtext=~${e.lat},${e.lon}&rtt=auto&text=${encodeURIComponent(e.address)}`}
-function mapSrc(e){return `https://yandex.ru/map-widget/v1/?ll=${e.lon},${e.lat}&z=16&mode=search&text=${encodeURIComponent(e.address)}`}
+const state = {
+  user: null,
+  platform: 'web',
+  version: '',
+  startParam: '',
+  favorites: [],
+  subscriptions: [],
+  reviews: {},
+  activeTab: 'home',
+  selectedVenue: 'Все площадки',
+  selectedDate: 'all',
+  notifications: [],
+  history: []
+};
 
-function setTop(title,detail=false){pageTitle.textContent=title; backBtn.classList.toggle('hidden',!detail); closeBtn.classList.toggle('hidden',detail); filters.classList.toggle('hidden',detail)}
-function render(){
-  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===state.tab));
-  $('#dateFilter b').textContent = state.selectedDate ? fmtDate(state.selectedDate) : 'Выберите дату';
-  $('#venueFilter b').textContent = state.selectedVenue;
-  if(state.view==='detail') return renderDetail();
-  setTop('Афиша Севастополя',false);
-  if(state.tab==='favorites') return renderFavorites();
-  if(state.tab==='subscriptions') return renderSubscriptions();
-  renderHome();
-}
-function renderHome(){
-  const list=byDate(); const g=groups(list); const dates=Object.keys(g);
-  app.innerHTML= dates.length ? dates.map(date=>dayBlock(date,g[date])).join('') : '<div class="empty">Событий по фильтру не найдено</div>';
-  bindCards();
-}
-function dayBlock(date,items){
-  const featured=items.filter(e=>e.featured);
-  return `<section><div class="day-head"><strong>${dayName(date)}</strong><span>${date==='2026-04-26'?'воскресенье':fmtDate(date)}</span></div>
-  <button class="all-day"><div class="clock">◷</div><div class="all-day-text"><b>Весь день</b><span>${items.length} ${items.length===1?'мероприятие':'мероприятия'}</span></div><div class="count">${items.length}</div><div class="chev">⌄</div></button>
-  ${featured.length?`<div class="featured-row">${featured.map(featureCard).join('')}</div>`:''}
-  ${items.map(eventCard).join('')}</section>`
-}
-function featureCard(e){return `<button class="feature-card" data-event="${e.id}">${img(e,'feature-img')}<div><h3>${e.title}</h3>${place(e)}</div></button>`}
-function eventCard(e){return `<button class="event-card" data-event="${e.id}">${img(e)}<div class="event-info"><div class="time">${e.time}</div><h3 class="event-title">${e.title}</h3>${place(e)}</div>${is('favorites',e.id)?'<div class="heart-mini">♥</div>':''}</button>`}
-function bindCards(){document.querySelectorAll('[data-event]').forEach(el=>el.onclick=()=>{state.view='detail';state.opened=el.dataset.event;state.expanded=false;window.scrollTo(0,0);render()})}
-function renderFavorites(){
-  const fav=EVENTS.filter(e=>is('favorites',e.id));
-  app.innerHTML=`<h2 class="section-title">Ваш список избранных мероприятий</h2><p class="section-subtitle">Даты, которые вы сохранили, чтобы не потерять среди общей ленты</p>${fav.length?fav.map(eventCard).join(''):'<div class="empty">В избранном пока пусто</div>'}`;
-  bindCards();
-}
-function renderSubscriptions(){
-  const subVenues=arr('subscriptions');
-  const list=[...new Set(EVENTS.filter(e=>subVenues.includes(e.venue)).map(e=>e.venue))];
-  app.innerHTML=`<h2 class="section-title">Список подписок</h2><p class="section-subtitle">Вы получите уведомление, когда организатор добавит новые даты</p>${list.length?list.map(venueCard).join(''):'<div class="empty">Подписок пока нет</div>'}`;
-  bindCards();
-}
-function venueCard(venue){
-  const evs=EVENTS.filter(e=>e.venue===venue).slice(0,2); const first=evs[0];
-  return `<article class="sub-card"><div class="sub-top">${img(first,'poster')}<div><h3>${first.title}</h3>${place(first)}</div><button class="bell" data-sub="${venue}">♢</button></div><div class="sub-dates">${evs.map(e=>`<button class="date-line" data-event="${e.id}"><strong>${fmtDate(e.date)}</strong><span>${weekday(e.date)}</span><div class="date-actions"><span>${e.time}</span><b>›</b></div></button>`).join('')}</div></article>`
-}
-function renderDetail(){
-  const e=EVENTS.find(x=>x.id===state.opened); if(!e)return;
-  setTop(e.title,true);
-  const desc=state.expanded?e.description:e.description.slice(0,155)+'...';
-  app.innerHTML=`<section class="detail"><div class="detail-title">${e.title}</div><div class="detail-hero">${img(e,'detail-img')}</div><div class="detail-card"><div class="when">${dayName(e.date)} в ${e.time}</div><div class="detail-place place"><b>⌖</b><span>${e.venue}</span></div><div class="action-row"><button class="pill-btn" id="favBtn">${is('favorites',e.id)?'♥ В избранном':'♡ Избранное'}</button><button class="pill-btn" id="subBtn">${is('subscriptions',e.venue)?'♢ Подписаны':'♢ Подписаться'}</button><button class="pill-btn mini" id="helpBtn">?</button></div><div class="divider"></div><h2 class="block-title">О событии</h2><p class="description">${desc}</p><button class="readmore" id="readMore">${state.expanded?'Свернуть⌃':'Читать далее ›'}</button><button class="review-row" id="reviewBtn"><span class="review-score">${reviewScore(e.id)}</span><span class="review-star">★</span><span class="review-text"><b>${reviewCount(e.id)?'Отзывы':'Отзывов пока нет'}</b><span>${reviewCount(e.id)?reviewCount(e.id)+' отзыв':'Будьте первым, кто оставит отзыв'}</span></span><span class="arrow">›</span></button><h2 class="block-title">Также доступны другие даты:</h2><div class="dates-list">${otherDates(e).map(d=>`<div class="date-line"><strong>${fmtDate(d.date)}</strong><span>${weekday(d.date)}</span><div class="date-actions"><button class="ticket-small">Билеты</button><button onclick="toggle('favorites','${d.id}')">${is('favorites',d.id)?'♥':'♡'}</button></div></div>`).join('')||'<div class="date-line"><span>Других дат пока нет</span></div>'}</div><h2 class="block-title">Адрес площадки: <span style="font-weight:500">${e.address}</span></h2><div class="map-box"><iframe src="${mapSrc(e)}" loading="lazy"></iframe></div><a class="route" href="${routeUrl(e)}" target="_blank" rel="noopener">Построить маршрут</a><div class="buybar"><a href="${e.ticketsUrl}" target="_blank" rel="noopener">Купить билет</a></div></div></section>`;
-  $('#favBtn').onclick=()=>toggle('favorites',e.id);
-  $('#subBtn').onclick=()=>toggle('subscriptions',e.venue);
-  $('#readMore').onclick=()=>{state.expanded=!state.expanded;render()};
-  $('#reviewBtn').onclick=()=>openReview(e);
-  $('#helpBtn').onclick=()=>alert('Сохраните событие, подпишитесь на площадку или постройте маршрут до места проведения.');
-}
-function otherDates(e){return EVENTS.filter(x=>x.title===e.title&&x.id!==e.id)}
-function reviewCount(id){return arr('reviews').filter(r=>r.id===id).length}
-function reviewScore(id){const r=arr('reviews').filter(x=>x.id===id); if(!r.length)return '☆'; return Math.round(r.reduce((s,x)=>s+x.rating,0)/r.length)}
-function openReview(e){
-  modal.innerHTML=`<div class="modal"><div class="modal-card"><button class="modal-close">×</button><div class="avatar">О</div><h2>Отзыв</h2><p>Олег<br>${e.title}</p><div class="stars">${[1,2,3,4,5].map(i=>`<button class="star" data-rate="${i}">☆</button>`).join('')}</div><p id="rateText">Нажмите для оценки</p><textarea id="reviewText" placeholder="Поделитесь впечатлениями..."></textarea><button class="submit" id="sendReview">Отправить</button></div></div>`;
-  let rating=0;
-  modal.querySelector('.modal-close').onclick=()=>modal.innerHTML='';
-  modal.querySelectorAll('.star').forEach(st=>st.onclick=()=>{rating=Number(st.dataset.rate);modal.querySelectorAll('.star').forEach(x=>{x.textContent=Number(x.dataset.rate)<=rating?'★':'☆';x.classList.toggle('active',Number(x.dataset.rate)<=rating)});$('#rateText').textContent=rating===5?'В восторге':'Оценка '+rating});
-  $('#sendReview').onclick=()=>{if(!rating)return; store.reviews=[...arr('reviews'),{id:e.id,rating,text:$('#reviewText').value.trim(),date:Date.now()}]; saveStore(); modal.innerHTML=''; render()};
+const view = document.getElementById('view');
+const overlayRoot = document.getElementById('overlayRoot');
+const titleEl = document.getElementById('appTitle');
+const headerBack = document.getElementById('headerBack');
+const menuButton = document.getElementById('menuButton');
+const navButtons = [...document.querySelectorAll('.nav-btn')];
+
+const WebApp = window.WebApp || null;
+
+async function boot() {
+  view.innerHTML = document.getElementById('loadingTemplate').innerHTML;
+  initMaxBridge();
+  await hydrateState();
+  applyStartParam();
+  bindGlobalEvents();
+  renderCurrentView();
 }
 
-function openCalendar(){
-  const dates=[...new Set(EVENTS.map(e=>e.date))];
-  modal.innerHTML=`<div class="fade"></div><div class="calendar"><div class="cal-head"><button>‹</button><strong>апрель 2026 г.</strong><button>›</button></div><div class="cal-grid">${['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(d=>`<div class="cal-week">${d}</div>`).join('')}${[30,31,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,1,2,3].map((d,i)=>{const iso=(i<2?`2026-03-${d}`:i>31?`2026-05-0${d}`:`2026-04-${String(d).padStart(2,'0')}`);return `<button class="cal-day ${i<2||i>31?'off':''} ${state.selectedDate===iso?'active':''}" data-date="${iso}">${d}</button>`}).join('')}</div></div>`;
-  modal.querySelector('.fade').onclick=()=>modal.innerHTML='';
-  modal.querySelectorAll('.cal-day').forEach(b=>b.onclick=()=>{state.selectedDate=dates.includes(b.dataset.date)?b.dataset.date:null;modal.innerHTML='';render()});
-}
-function openVenues(){
-  const venues=['Все площадки',...new Set(EVENTS.map(e=>e.venue))];
-  modal.innerHTML=`<div class="fade"></div><div class="venues">${venues.map(v=>`<button class="venue-item ${state.selectedVenue===v?'active':''}" data-venue="${v}"><b>${v}</b>${state.selectedVenue===v?'<span>✓</span>':''}</button>`).join('')}</div>`;
-  modal.querySelector('.fade').onclick=()=>modal.innerHTML='';
-  modal.querySelectorAll('.venue-item').forEach(b=>b.onclick=()=>{state.selectedVenue=b.dataset.venue;modal.innerHTML='';render()});
+function initMaxBridge() {
+  if (!WebApp) return;
+  try {
+    state.user = WebApp.initDataUnsafe?.user || null;
+    state.platform = WebApp.platform || 'web';
+    state.version = WebApp.version || '';
+    state.startParam = WebApp.initDataUnsafe?.start_param || '';
+    WebApp.enableClosingConfirmation?.();
+    WebApp.BackButton?.hide?.();
+  } catch (err) {
+    console.warn('MAX Bridge init error', err);
+  }
 }
 
-document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{state.tab=b.dataset.tab;state.view='home';window.scrollTo(0,0);render()});
-backBtn.onclick=()=>{state.view='home';render()};
-closeBtn.onclick=()=>{if(window.WebApp?.close) window.WebApp.close()};
-$('#dateFilter').onclick=openCalendar;
-$('#venueFilter').onclick=openVenues;
+function storageKey(name) {
+  const userId = state.user?.id || 'guest';
+  return `max-mini-app:${userId}:${name}`;
+}
 
-window.WebApp?.ready?.();
-window.WebApp?.expand?.();
-render();
+async function setPersistent(name, value) {
+  const serialized = JSON.stringify(value);
+  try {
+    if (WebApp?.DeviceStorage?.setItem && state.platform !== 'web' && state.platform !== 'desktop') {
+      await WebApp.DeviceStorage.setItem(storageKey(name), serialized);
+      return;
+    }
+  } catch (err) {
+    console.warn('DeviceStorage set failed', err);
+  }
+  localStorage.setItem(storageKey(name), serialized);
+}
+
+async function getPersistent(name, fallback) {
+  try {
+    if (WebApp?.DeviceStorage?.getItem && state.platform !== 'web' && state.platform !== 'desktop') {
+      const result = await WebApp.DeviceStorage.getItem(storageKey(name));
+      if (result?.value) return JSON.parse(result.value);
+    }
+  } catch (err) {
+    console.warn('DeviceStorage get failed', err);
+  }
+  const raw = localStorage.getItem(storageKey(name));
+  return raw ? JSON.parse(raw) : fallback;
+}
+
+async function hydrateState() {
+  state.favorites = await getPersistent('favorites', []);
+  state.subscriptions = await getPersistent('subscriptions', []);
+  state.reviews = await getPersistent('reviews', {});
+  state.notifications = await getPersistent('notifications', createInitialNotifications());
+}
+
+function applyStartParam() {
+  const param = state.startParam;
+  if (!param) return;
+  if (param.startsWith('event_')) {
+    const id = param.replace('event_', 'event-');
+    const target = EVENTS.find((e) => e.id === id);
+    if (target) openEvent(target.id, false);
+  }
+  if (param.startsWith('venue_')) {
+    const decodedVenue = decodeURIComponent(param.replace('venue_', '').replaceAll('_', ' '));
+    if (VENUES.includes(decodedVenue)) state.selectedVenue = decodedVenue;
+  }
+}
+
+function bindGlobalEvents() {
+  navButtons.forEach((btn) => btn.addEventListener('click', () => {
+    navigateToTab(btn.dataset.tab);
+  }));
+
+  headerBack.addEventListener('click', goBack);
+  menuButton.addEventListener('click', openMenuModal);
+
+  if (WebApp?.BackButton?.onClick) {
+    WebApp.BackButton.onClick(goBack);
+  }
+}
+
+function vibrate(type = 'light') {
+  try {
+    WebApp?.HapticFeedback?.impactOccurred?.(type).catch(() => {});
+  } catch (_) {}
+}
+
+function notifyStatus(type = 'success') {
+  try {
+    WebApp?.HapticFeedback?.notificationOccurred?.(type).catch(() => {});
+  } catch (_) {}
+}
+
+function navigateToTab(tab) {
+  state.activeTab = tab;
+  state.history = [];
+  renderCurrentView();
+}
+
+function pushHistory(entry) {
+  state.history.push(entry);
+  syncBackButton();
+}
+
+function goBack() {
+  closeOverlay();
+  const prev = state.history.pop();
+  if (!prev) return;
+  if (prev.type === 'tab') {
+    state.activeTab = prev.tab;
+  } else if (prev.type === 'event') {
+    state.activeTab = 'event';
+    state.currentEventId = prev.id;
+  }
+  renderCurrentView();
+}
+
+function syncBackButton() {
+  const visible = state.history.length > 0 || overlayRoot.innerHTML.trim();
+  headerBack.classList.toggle('hidden', !visible);
+  if (!WebApp?.BackButton) return;
+  if (visible) WebApp.BackButton.show?.();
+  else WebApp.BackButton.hide?.();
+}
+
+function renderCurrentView() {
+  navButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === state.activeTab));
+  syncBackButton();
+
+  switch (state.activeTab) {
+    case 'favorites':
+      titleEl.textContent = 'Избранное';
+      renderFavorites();
+      break;
+    case 'notifications':
+      titleEl.textContent = 'Уведомления';
+      renderNotifications();
+      break;
+    case 'event':
+      const current = EVENTS.find((e) => e.id === state.currentEventId);
+      titleEl.textContent = current?.title || 'Событие';
+      renderEventDetail(state.currentEventId);
+      break;
+    default:
+      titleEl.textContent = 'Афиша';
+      renderHome();
+      break;
+  }
+}
+
+function renderHome() {
+  const events = getFilteredEvents();
+  const featured = events.filter((e) => e.featured);
+  view.innerHTML = `
+    <section class="screen">
+      <div class="filters">
+        <button class="filter-btn" id="dateFilterBtn">
+          <span class="filter-icon">▦</span><span>${state.selectedDate === 'all' ? 'Выберите дату' : DATE_LABELS[state.selectedDate]}</span>
+        </button>
+        <button class="filter-btn" id="venueFilterBtn">
+          <span class="filter-icon">⌖</span><span>${state.selectedVenue}</span>
+        </button>
+      </div>
+
+      <div class="section-head">
+        <div class="section-title">Сегодня</div>
+        <button class="link-btn" id="resetFiltersBtn">Сбросить</button>
+      </div>
+
+      <div class="horizontal-scroller">
+        ${featured.map(renderHighlightCard).join('')}
+      </div>
+
+      <div class="section-head">
+        <div class="section-title">Все события</div>
+        <div class="muted small">${events.length} шт.</div>
+      </div>
+
+      ${renderEventsGrouped(events)}
+    </section>
+  `;
+
+  document.getElementById('dateFilterBtn').addEventListener('click', openDateModal);
+  document.getElementById('venueFilterBtn').addEventListener('click', openVenueModal);
+  document.getElementById('resetFiltersBtn').addEventListener('click', () => {
+    state.selectedDate = 'all';
+    state.selectedVenue = 'Все площадки';
+    renderHome();
+  });
+  bindEventCards();
+}
+
+function renderFavorites() {
+  const events = getFilteredEvents().filter((e) => state.favorites.includes(e.id));
+  view.innerHTML = `
+    <section class="screen">
+      <div class="filters">
+        <button class="filter-btn" id="dateFilterBtn"><span class="filter-icon">▦</span><span>${state.selectedDate === 'all' ? 'Выберите дату' : DATE_LABELS[state.selectedDate]}</span></button>
+        <button class="filter-btn" id="venueFilterBtn"><span class="filter-icon">⌖</span><span>${state.selectedVenue}</span></button>
+      </div>
+      <div class="panel">
+        <div class="section-title">Ваш список избранных мероприятий</div>
+        <p class="muted small">Даты, которые вы сохранили, чтобы не потерять среди общей ленты.</p>
+      </div>
+      ${events.length ? renderEventsGrouped(events) : renderEmpty('♡', 'Пока ничего нет', 'Добавляйте события в избранное прямо из карточки события или из общего списка.')}
+    </section>
+  `;
+
+  document.getElementById('dateFilterBtn').addEventListener('click', openDateModal);
+  document.getElementById('venueFilterBtn').addEventListener('click', openVenueModal);
+  bindEventCards();
+}
+
+function renderNotifications() {
+  view.innerHTML = `
+    <section class="screen">
+      <div class="panel">
+        <div class="section-title">Список подписок</div>
+        <p class="muted small">Вы получите уведомление, когда организатор добавит новые даты.</p>
+      </div>
+      ${state.notifications.length ? `
+        <div class="reviews-wrap">
+          ${state.notifications.map((item, index) => `
+            <button class="review-item option-btn notification-item" data-index="${index}" data-event="${item.eventId || ''}">
+              <div class="review-head">
+                <strong>${item.title}</strong>
+                <span class="tiny muted">${item.time}</span>
+              </div>
+              <div class="small muted">${item.body}</div>
+            </button>
+          `).join('')}
+        </div>
+      ` : renderEmpty('🔔', 'Пока пусто', 'Когда вы подпишетесь на площадку или сохраните событие, уведомления появятся здесь.')}
+    </section>
+  `;
+
+  document.querySelectorAll('.notification-item').forEach((node) => {
+    node.addEventListener('click', () => {
+      const eventId = node.dataset.event;
+      if (eventId) openEvent(eventId);
+    });
+  });
+}
+
+function renderEventDetail(id) {
+  const event = EVENTS.find((item) => item.id === id);
+  if (!event) {
+    view.innerHTML = renderEmpty('⚠', 'Событие не найдено', 'Возможно, оно было удалено или ссылка устарела.');
+    return;
+  }
+
+  const reviews = getEventReviews(id);
+  const descriptionPreview = event.description.slice(0, 165);
+  const expanded = state.descriptionExpanded === id;
+  const isFav = state.favorites.includes(id);
+  const isSub = state.subscriptions.includes(event.venue);
+
+  view.innerHTML = `
+    <section class="screen">
+      <article class="panel hero">
+        <div class="hero-media" style="background-image:url('${event.image}')">
+          <div class="hero-overlay">
+            <div class="hero-badge">${formatDate(event.date)} • ${event.time}</div>
+          </div>
+        </div>
+      </article>
+
+      <div class="panel detail-meta">
+        <div class="detail-time">${event.time}</div>
+        <div class="detail-title">${event.title}</div>
+        <div class="muted">⌖ ${event.venue}</div>
+        <div class="tags">
+          <span class="tag">${event.category}</span>
+          <span class="tag">${event.age}</span>
+          <span class="tag">${event.duration}</span>
+        </div>
+      </div>
+
+      <div class="cta-row">
+        <button class="action-pill ${isFav ? 'active' : ''}" id="favoriteToggleBtn">${isFav ? 'В избранном' : 'В избранное'}</button>
+        <button class="action-pill ${isSub ? 'active' : ''}" id="subscribeToggleBtn">${isSub ? 'Подписаны' : 'Подписаться'}</button>
+        <button class="action-pill" id="shareBtn">Поделиться</button>
+      </div>
+
+      <div class="panel detail-block">
+        <h3>О событии</h3>
+        <div class="detail-text">${expanded ? event.description : descriptionPreview + (event.description.length > 165 ? '…' : '')}</div>
+        ${event.description.length > 165 ? `<button class="link-btn" id="toggleDescriptionBtn">${expanded ? 'Свернуть' : 'Читать полностью'}</button>` : ''}
+      </div>
+
+      <div class="panel detail-block">
+        <h4>Детали</h4>
+        <div class="inline-stats">
+          <span class="stat-chip">${formatDate(event.date)}</span>
+          <span class="stat-chip">${event.duration}</span>
+          <span class="stat-chip">Возраст: ${event.age}</span>
+        </div>
+      </div>
+
+      <div class="panel detail-block">
+        <div class="section-head">
+          <div class="section-title">Отзывы</div>
+          <button class="link-btn" id="openReviewBtn">Оставить отзыв</button>
+        </div>
+        ${reviews.length ? `
+          <div class="reviews-wrap">${reviews.map(renderReviewItem).join('')}</div>
+        ` : `<div class="empty-state"><div class="empty-icon">★</div><div><strong>Отзывов пока нет</strong><div class="small muted">Станьте первым, кто оставит оценку этому событию.</div></div></div>`}
+      </div>
+
+      <div class="map-card">
+        <div class="map-title"><strong>Адрес площадки:</strong> ${event.address}</div>
+        <iframe
+          class="real-map"
+          src="https://yandex.ru/map-widget/v1/?ll=${event.lon}%2C${event.lat}&z=16&pt=${event.lon},${event.lat},pm2rdm"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Карта ${event.venue}"></iframe>
+        <div class="map-footer">
+          <div class="small muted">${event.venue}</div>
+          <button class="action-pill" id="routeBtn">Построить маршрут</button>
+        </div>
+      </div>
+
+      <div class="bottom-cta">
+        <button class="primary-btn" id="buyBtn">Купить билет</button>
+      </div>
+    </section>
+  `;
+
+  document.getElementById('favoriteToggleBtn').addEventListener('click', () => toggleFavorite(id));
+  document.getElementById('subscribeToggleBtn').addEventListener('click', () => toggleSubscription(event.venue, id));
+  document.getElementById('shareBtn').addEventListener('click', () => shareEvent(event));
+  document.getElementById('openReviewBtn').addEventListener('click', () => openReviewModal(id));
+  document.getElementById('buyBtn').addEventListener('click', () => openTargetAction(event));
+  document.getElementById('routeBtn').addEventListener('click', () => openRoute(event));
+
+  if (document.getElementById('toggleDescriptionBtn')) {
+    document.getElementById('toggleDescriptionBtn').addEventListener('click', () => {
+      state.descriptionExpanded = expanded ? null : id;
+      renderEventDetail(id);
+    });
+  }
+}
+
+function renderUserCard() {
+  return '';
+}
+
+function getFilteredEvents() {
+  return EVENTS.filter((event) => {
+    const dateOk = state.selectedDate === 'all' || event.date === state.selectedDate;
+    const venueOk = state.selectedVenue === 'Все площадки' || event.venue === state.selectedVenue;
+    return dateOk && venueOk;
+  }).sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
+}
+
+function renderEventsGrouped(events) {
+  const groups = events.reduce((acc, event) => {
+    acc[event.date] ||= [];
+    acc[event.date].push(event);
+    return acc;
+  }, {});
+
+  return Object.entries(groups).map(([date, list]) => `
+    <div class="day-group">
+      <div class="day-title"><span>${formatDate(date)}</span><span class="muted small">${list.length} событий</span></div>
+      ${renderSegments(list)}
+    </div>
+  `).join('');
+}
+
+function renderSegments(events) {
+  const segments = { 'весь день': [], 'до 18:00': [], 'после 18:00': [] };
+  events.forEach((event) => {
+    if (event.duration === 'Весь день') segments['весь день'].push(event);
+    else if (event.time < '18:00') segments['до 18:00'].push(event);
+    else segments['после 18:00'].push(event);
+  });
+  return Object.entries(segments).filter(([, items]) => items.length).map(([label, items]) => `
+    <div>
+      <div class="segment-label">${label}</div>
+      <div class="reviews-wrap">${items.map(renderEventCard).join('')}</div>
+    </div>
+  `).join('');
+}
+
+function renderEventCard(event) {
+  const isFav = state.favorites.includes(event.id);
+  return `
+    <article class="event-card" data-open-event="${event.id}">
+      <img class="event-thumb" src="${event.image}" alt="${event.title}" />
+      <div>
+        <div class="event-time">${event.time}</div>
+        <div class="event-title">${event.title}</div>
+        <div class="event-meta">${event.venue} • ${event.address}</div>
+      </div>
+      <button class="heart-btn ${isFav ? 'active' : ''}" data-fav-id="${event.id}" aria-label="Избранное">${isFav ? '♥' : '♡'}</button>
+    </article>
+  `;
+}
+
+function renderHighlightCard(event) {
+  return `
+    <article class="highlight-card" data-open-event="${event.id}" style="background-image:url('${event.image}')">
+      <div class="highlight-content">
+        <div class="highlight-time">${event.time}</div>
+        <div class="highlight-title">${event.title}</div>
+        <div class="small muted">${event.venue}</div>
+      </div>
+    </article>
+  `;
+}
+
+function renderEmpty(icon, title, text) {
+  return `
+    <div class="empty-state">
+      <div class="empty-icon">${icon}</div>
+      <div><strong>${title}</strong><div class="small muted">${text}</div></div>
+    </div>
+  `;
+}
+
+function bindEventCards() {
+  document.querySelectorAll('[data-open-event]').forEach((node) => {
+    node.addEventListener('click', (e) => {
+      if (e.target.closest('[data-fav-id]')) return;
+      openEvent(node.dataset.openEvent);
+    });
+  });
+
+  document.querySelectorAll('[data-fav-id]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleFavorite(btn.dataset.favId);
+    });
+  });
+}
+
+function openEvent(id, push = true) {
+  if (push) pushHistory({ type: 'tab', tab: state.activeTab });
+  state.activeTab = 'event';
+  state.currentEventId = id;
+  renderCurrentView();
+}
+
+async function toggleFavorite(id) {
+  vibrate();
+  const has = state.favorites.includes(id);
+  state.favorites = has ? state.favorites.filter((item) => item !== id) : [...state.favorites, id];
+  await setPersistent('favorites', state.favorites);
+  addNotification(has ? 'Удалено из избранного' : 'Событие сохранено', has ? 'Вы убрали событие из избранного.' : 'Событие добавлено в избранное.', id);
+  notifyStatus('success');
+  renderCurrentView();
+}
+
+async function toggleSubscription(venue, id) {
+  vibrate();
+  const has = state.subscriptions.includes(venue);
+  state.subscriptions = has ? state.subscriptions.filter((item) => item !== venue) : [...state.subscriptions, venue];
+  await setPersistent('subscriptions', state.subscriptions);
+  addNotification(has ? 'Подписка отключена' : 'Подписка включена', has ? `Вы отписались от площадки ${venue}.` : `Теперь вы будете получать анонсы площадки ${venue}.`, id);
+  notifyStatus('success');
+  renderCurrentView();
+}
+
+function createInitialNotifications() {
+  return [
+    { title: 'Подписки пока пустые', body: 'Подпишитесь на событие или площадку, чтобы не пропустить новые даты.', time: 'Сейчас', eventId: '' }
+  ];
+}
+
+async function addNotification(title, body, eventId = '') {
+  state.notifications = [{ title, body, time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }), eventId }, ...state.notifications].slice(0, 20);
+  await setPersistent('notifications', state.notifications);
+}
+
+function getEventReviews(eventId) {
+  return state.reviews[eventId] || [];
+}
+
+function renderReviewItem(review) {
+  return `
+    <div class="review-item">
+      <div class="review-head">
+        <strong>${review.author}</strong>
+        <span class="stars">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</span>
+      </div>
+      <div class="small muted">${review.date}</div>
+      ${review.text ? `<div class="detail-text" style="margin-top:8px">${escapeHtml(review.text)}</div>` : ''}
+    </div>
+  `;
+}
+
+function openDateModal() {
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">Выберите дату</div>
+      <button class="icon-btn" data-close-modal>✕</button>
+    </div>
+    <div class="panel" style="padding:12px; margin-bottom:12px;">
+      <div class="small muted">Быстрый выбор</div>
+      <div class="option-list" style="margin-top:8px;">
+        ${Object.entries(DATE_LABELS).map(([key, label]) => `<button class="option-btn ${state.selectedDate === key ? 'active' : ''}" data-date="${key}">${label}</button>`).join('')}
+      </div>
+    </div>
+    ${renderMiniCalendar()}
+  `);
+
+  overlayRoot.querySelectorAll('[data-date]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.selectedDate = btn.dataset.date;
+      closeOverlay();
+      renderCurrentView();
+      vibrate('soft');
+    });
+  });
+}
+
+function renderMiniCalendar() {
+  const monthDays = Array.from({ length: 30 }, (_, i) => i + 1);
+  const weekdays = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  return `
+    <div class="panel">
+      <div class="section-head"><div class="section-title">Апрель 2026</div><div class="small muted">Демо календарь</div></div>
+      <div class="calendar-grid" style="margin-top:10px;">
+        ${weekdays.map((d) => `<div class="weekday">${d}</div>`).join('')}
+        ${monthDays.map((day) => {
+          const date = `2026-04-${String(day).padStart(2,'0')}`;
+          const active = state.selectedDate === date;
+          const hasEvents = EVENTS.some((e) => e.date === date);
+          return `<button class="day-cell ${active ? 'active' : ''} ${!hasEvents ? 'muted' : ''}" data-date="${date}">${day}</button>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function openVenueModal() {
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">Выберите площадку</div>
+      <button class="icon-btn" data-close-modal>✕</button>
+    </div>
+    <div class="option-list">
+      ${VENUES.map((venue) => `<button class="option-btn ${state.selectedVenue === venue ? 'active' : ''}" data-venue="${venue}">${venue}</button>`).join('')}
+    </div>
+  `);
+  overlayRoot.querySelectorAll('[data-venue]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.selectedVenue = btn.dataset.venue;
+      closeOverlay();
+      renderCurrentView();
+      vibrate('soft');
+    });
+  });
+}
+
+function openReviewModal(eventId) {
+  const event = EVENTS.find((item) => item.id === eventId);
+  let rating = 0;
+  openModal(`
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Отзыв</div>
+        <div class="small muted">${event.title}</div>
+      </div>
+      <button class="icon-btn" data-close-modal>✕</button>
+    </div>
+    <div class="small muted">Оценка</div>
+    <div class="review-stars">
+      ${[1,2,3,4,5].map((n) => `<button class="star-btn" data-star="${n}">★</button>`).join('')}
+    </div>
+    <textarea id="reviewText" class="textarea" placeholder="Расскажите, что понравилось или что стоит улучшить"></textarea>
+    <div style="height:12px"></div>
+    <button class="primary-btn" id="submitReviewBtn" disabled>Отправить</button>
+  `);
+
+  const submit = overlayRoot.querySelector('#submitReviewBtn');
+  overlayRoot.querySelectorAll('[data-star]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      rating = Number(btn.dataset.star);
+      overlayRoot.querySelectorAll('[data-star]').forEach((node, idx) => node.classList.toggle('active', idx < rating));
+      submit.disabled = rating === 0;
+      vibrate('light');
+    });
+  });
+
+  submit.addEventListener('click', async () => {
+    const text = overlayRoot.querySelector('#reviewText').value.trim();
+    const author = state.user ? [state.user.first_name, state.user.last_name].filter(Boolean).join(' ') : 'Гость MAX';
+    const payload = { author, rating, text, date: new Date().toLocaleDateString('ru-RU') };
+    state.reviews[eventId] ||= [];
+    state.reviews[eventId].unshift(payload);
+    await setPersistent('reviews', state.reviews);
+    await addNotification('Новый отзыв', `Вы оставили отзыв на событие «${event.title}».`, eventId);
+    notifyStatus('success');
+    closeOverlay();
+    renderEventDetail(eventId);
+  });
+}
+
+function openMenuModal() {
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">Меню</div>
+      <button class="icon-btn" data-close-modal>✕</button>
+    </div>
+    <div class="menu-list">
+      <button class="option-btn" data-menu="share-app">Поделиться приложением</button>
+      <button class="option-btn" data-menu="about">О проекте</button>
+      <button class="option-btn" data-menu="clear">Очистить локальные данные</button>
+    </div>
+  `);
+
+  overlayRoot.querySelectorAll('[data-menu]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const action = btn.dataset.menu;
+      if (action === 'share-app') {
+        shareApp();
+      }
+      if (action === 'about') {
+        alert('Афиша Севастополя: события, избранное, подписки и отзывы.');
+      }
+      if (action === 'clear') {
+        localStorage.clear();
+        if (WebApp?.DeviceStorage?.clear) {
+          try { await WebApp.DeviceStorage.clear(); } catch (_) {}
+        }
+        location.reload();
+      }
+      closeOverlay();
+    });
+  });
+}
+
+function openModal(content) {
+  overlayRoot.innerHTML = `<div class="overlay"><div class="modal">${content}</div></div>`;
+  syncBackButton();
+  overlayRoot.querySelectorAll('[data-close-modal]').forEach((btn) => btn.addEventListener('click', closeOverlay));
+  overlayRoot.querySelector('.overlay')?.addEventListener('click', (e) => {
+    if (e.target.classList.contains('overlay')) closeOverlay();
+  });
+}
+
+function closeOverlay() {
+  overlayRoot.innerHTML = '';
+  syncBackButton();
+}
+
+function shareApp() {
+  const link = 'https://max.ru/YourBotName?startapp';
+  if (WebApp?.shareMaxContent) {
+    WebApp.shareMaxContent({ text: `Открой мини-приложение: ${link}` }).catch(() => {
+      navigator.clipboard?.writeText(link);
+    });
+  } else {
+    navigator.clipboard?.writeText(link);
+  }
+}
+
+function shareEvent(event) {
+  const link = `https://max.ru/YourBotName?startapp=${event.id.replace('event-', 'event_')}`;
+  const text = `${event.title} • ${formatDate(event.date)} ${event.time}\n${event.venue}\n${link}`;
+  if (WebApp?.shareMaxContent) {
+    WebApp.shareMaxContent({ text }).catch(() => WebApp?.openMaxLink?.(link));
+  } else if (navigator.share) {
+    navigator.share({ title: event.title, text }).catch(() => {});
+  } else {
+    navigator.clipboard?.writeText(text);
+  }
+}
+
+function openTargetAction(event) {
+  if (WebApp?.openLink) {
+    WebApp.openLink(event.ticketsUrl);
+  } else {
+    window.open(event.ticketsUrl, '_blank', 'noopener,noreferrer');
+  }
+}
+
+function openRoute(event) {
+  const url = `https://yandex.ru/maps/?rtext=~${event.lat}%2C${event.lon}&rtt=auto&z=16`;
+  if (WebApp?.openLink) WebApp.openLink(url);
+  else window.open(url, '_blank', 'noopener,noreferrer');
+}
+
+function formatDate(date) {
+  const formatter = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', weekday: 'long' });
+  return formatter.format(new Date(date + 'T12:00:00'));
+}
+
+function escapeHtml(str) {
+  return str.replace(/[&<>'"]/g, (tag) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', "'": '&#39;' }[tag] || tag));
+}
+
+boot();
